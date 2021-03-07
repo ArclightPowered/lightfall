@@ -206,4 +206,7 @@ lightfall-proxy
 # intellij
 *.ipr
 out/
+logs/
+config.yml
+waterfall.yml
 

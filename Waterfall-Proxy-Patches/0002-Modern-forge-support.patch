@@ -1,0 +1,410 @@
+From 8fe1b053c80cdbda76d6c1fe82fc66e38c17e636 Mon Sep 17 00:00:00 2001
+From: IzzelAliz <csh2001331@126.com>
+Date: Sun, 7 Mar 2021 22:24:56 +0800
+Subject: [PATCH] Modern forge support
+
+
+diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/MinecraftEncoder.java b/protocol/src/main/java/net/md_5/bungee/protocol/MinecraftEncoder.java
+index d4b03843..5d0ca482 100644
+--- a/protocol/src/main/java/net/md_5/bungee/protocol/MinecraftEncoder.java
++++ b/protocol/src/main/java/net/md_5/bungee/protocol/MinecraftEncoder.java
+@@ -4,12 +4,14 @@ import io.netty.buffer.ByteBuf;
+ import io.netty.channel.ChannelHandlerContext;
+ import io.netty.handler.codec.MessageToByteEncoder;
+ import lombok.AllArgsConstructor;
++import lombok.Getter;
+ import lombok.Setter;
+ 
+ @AllArgsConstructor
+ public class MinecraftEncoder extends MessageToByteEncoder<DefinedPacket>
+ {
+ 
++    @Getter
+     @Setter
+     private Protocol protocol;
+     private boolean server;
+diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
+index 26edbca8..f9a18aca 100644
+--- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
++++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
+@@ -498,6 +498,19 @@ public class Commands extends DefinedPacket
+                 return "brigadier:string";
+             }
+         };
++        // lightfall start
++        private static final ArgumentSerializer<String> FORGE_ENUM = new ArgumentSerializer<String>() {
++            @Override
++            protected String read(ByteBuf buf) {
++                return readString(buf);
++            }
++
++            @Override
++            protected void write(ByteBuf buf, String enumClass) {
++                writeString(enumClass, buf);
++            }
++        };
++        // lightfall end
+ 
+         static
+         {
+@@ -551,6 +564,10 @@ public class Commands extends DefinedPacket
+             PROVIDERS.put( "minecraft:test_argument", VOID ); // 1.16, debug
+             PROVIDERS.put( "minecraft:test_class", VOID ); // 1.16, debug
+             PROVIDERS.put( "minecraft:angle", VOID ); // 1.16.2
++            // lightfall start
++            PROVIDERS.put( "forge:enum", FORGE_ENUM );
++            PROVIDERS.put( "forge:modid", VOID );
++            // lightfall end
+         }
+ 
+         private static ArgumentType<?> read(String key, ByteBuf buf)
+diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/PluginMessage.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/PluginMessage.java
+index 17e12655..966f39cc 100644
+--- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/PluginMessage.java
++++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/PluginMessage.java
+@@ -46,7 +46,7 @@ public class PluginMessage extends DefinedPacket
+                 return tag;
+             }
+ 
+-            return "legacy:" + tag.toLowerCase( Locale.ROOT );
++            return "legacy:" + tag.toLowerCase( Locale.ROOT ).replace("|", ""); // Lightfall - remove illegal characters
+         }
+     };
+     public static final Predicate<PluginMessage> SHOULD_RELAY = new Predicate<PluginMessage>()
+diff --git a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeClientHandler.java b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeClientHandler.java
+new file mode 100644
+index 00000000..7a4a0317
+--- /dev/null
++++ b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeClientHandler.java
+@@ -0,0 +1,16 @@
++package io.izzel.lightfall.forge;
++
++import lombok.NonNull;
++import net.md_5.bungee.UserConnection;
++import net.md_5.bungee.forge.ForgeClientHandler;
++
++public class ModernForgeClientHandler extends ForgeClientHandler {
++
++    public ModernForgeClientHandler(@NonNull UserConnection con) {
++        super(con);
++    }
++
++    @Override
++    public void resetHandshake() {
++    }
++}
+diff --git a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
+new file mode 100644
+index 00000000..c60da353
+--- /dev/null
++++ b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
+@@ -0,0 +1,114 @@
++package io.izzel.lightfall.forge;
++
++import com.google.common.base.Preconditions;
++import net.md_5.bungee.BungeeServerInfo;
++import net.md_5.bungee.ServerConnector;
++import net.md_5.bungee.UserConnection;
++import net.md_5.bungee.api.ProxyServer;
++import net.md_5.bungee.connection.UpstreamBridge;
++import net.md_5.bungee.forge.ForgeConstants;
++import net.md_5.bungee.netty.ChannelWrapper;
++import net.md_5.bungee.netty.HandlerBoss;
++import net.md_5.bungee.protocol.PacketWrapper;
++import net.md_5.bungee.protocol.Protocol;
++import net.md_5.bungee.protocol.packet.EncryptionResponse;
++import net.md_5.bungee.protocol.packet.Kick;
++import net.md_5.bungee.protocol.packet.Login;
++import net.md_5.bungee.protocol.packet.LoginPayloadRequest;
++import net.md_5.bungee.protocol.packet.LoginSuccess;
++import net.md_5.bungee.protocol.packet.PluginMessage;
++import net.md_5.bungee.protocol.packet.SetCompression;
++
++import java.util.Queue;
++import java.util.concurrent.ConcurrentLinkedQueue;
++
++public class ModernForgeServerConnector extends ServerConnector {
++
++    private enum State {
++        PLAIN, PENDING, ACK
++    }
++
++    private final Queue<LoginPayloadRequest> pendingHandshakes = new ConcurrentLinkedQueue<>();
++    private volatile State thisState = State.PLAIN;
++
++    public ModernForgeServerConnector(ProxyServer bungee, UserConnection user, BungeeServerInfo target) {
++        super(bungee, user, target);
++    }
++
++    @Override
++    public boolean shouldHandle(PacketWrapper packet) throws Exception {
++        return thisState != State.PLAIN ?
++            (packet.packet instanceof LoginPayloadRequest
++                || packet.packet instanceof SetCompression
++                || packet.packet instanceof LoginSuccess
++                || packet.packet instanceof EncryptionResponse
++                || packet.packet instanceof PluginMessage
++                || packet.packet instanceof Kick
++            ) : super.shouldHandle(packet);
++    }
++
++    @Override
++    public void connected(ChannelWrapper channel) throws Exception {
++        super.connected(channel);
++    }
++
++    @Override
++    public void handle(LoginSuccess loginSuccess) throws Exception {
++        Preconditions.checkState(thisState != State.PENDING, "Not expecting PENDING");
++        if (thisState == State.ACK) {
++            user.unsafe().sendPacket(loginSuccess);
++            user.getCh().setProtocol(Protocol.GAME);
++            user.getCh().getHandle().pipeline().get(HandlerBoss.class).setHandler(new UpstreamBridge(bungee, user));
++            thisState = State.PLAIN;
++        }
++        super.handle(loginSuccess);
++    }
++
++    @Override
++    public void handle(Login login) throws Exception {
++        super.handle(login);
++    }
++
++    @Override
++    public void handle(LoginPayloadRequest request) {
++        switch (thisState) {
++            case PLAIN: {
++                user.setForgeServerHandler(getHandshakeHandler());
++                user.getCh().getHandle().flush();
++                user.getCh().write(ForgeConstants.MODERN_FML_RESET);
++                user.getCh().setProtocol(Protocol.LOGIN);
++                user.getCh().getHandle().pipeline().get(HandlerBoss.class).setHandler(new ModernForgeUpstreamBridge(bungee, user, this::onResetAck));
++                if (user.getServer() != null) {
++                    user.getServer().setObsolete(true);
++                    user.getServer().disconnect("Quiting");
++                }
++                thisState = State.PENDING;
++            }
++            case PENDING: {
++                this.pendingHandshakes.add(request);
++                break;
++            }
++            case ACK: {
++                user.unsafe().sendPacket(request);
++                break;
++            }
++        }
++    }
++
++    private void onResetAck() {
++        Preconditions.checkState(thisState == State.PENDING, "Not expecting PENDING");
++        while (!pendingHandshakes.isEmpty()) {
++            user.unsafe().sendPacket(pendingHandshakes.poll());
++        }
++        thisState = State.ACK;
++    }
++
++    @Override
++    public String toString() {
++        if (thisState != State.PLAIN) {
++            return "[" + user.getName() + "|" + user.getAddress() + "] <-> Modern FML " + thisState + " [" + target.getName() + "]";
++        } else {
++            return super.toString();
++        }
++    }
++}
+diff --git a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java
+new file mode 100644
+index 00000000..30e406d3
+--- /dev/null
++++ b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java
+@@ -0,0 +1,66 @@
++package io.izzel.lightfall.forge;
++
++import io.netty.handler.timeout.ReadTimeoutException;
++import lombok.RequiredArgsConstructor;
++import net.md_5.bungee.BungeeCord;
++import net.md_5.bungee.UserConnection;
++import net.md_5.bungee.Util;
++import net.md_5.bungee.api.ProxyServer;
++import net.md_5.bungee.api.event.PlayerDisconnectEvent;
++import net.md_5.bungee.netty.ChannelWrapper;
++import net.md_5.bungee.netty.PacketHandler;
++import net.md_5.bungee.protocol.PacketWrapper;
++import net.md_5.bungee.protocol.packet.LoginPayloadResponse;
++
++import java.nio.charset.StandardCharsets;
++import java.util.Arrays;
++
++@RequiredArgsConstructor
++public class ModernForgeUpstreamBridge extends PacketHandler {
++
++    private final ProxyServer bungee;
++    private final UserConnection con;
++    private final Runnable onAck;
++
++    @Override
++    public boolean shouldHandle(PacketWrapper packet) throws Exception {
++        return packet.packet instanceof LoginPayloadResponse;
++    }
++
++    @Override
++    public void handle(LoginPayloadResponse response) throws Exception {
++        if (isAckPacket(response)) {
++            onAck.run();
++        } else {
++            con.getForgeServerHandler().getCh().write(response);
++        }
++    }
++
++    @Override
++    public void exception(Throwable t) throws Exception {
++        if (t instanceof ReadTimeoutException) {
++            con.disconnect("You need to install lightfall client mod to join this server!");
++        } else {
++            con.disconnect(Util.exception(t));
++        }
++    }
++
++    @Override
++    public void disconnected(ChannelWrapper channel) throws Exception {
++        PlayerDisconnectEvent event = new PlayerDisconnectEvent(con);
++        bungee.getPluginManager().callEvent(event);
++        con.getTabListHandler().onDisconnect();
++        BungeeCord.getInstance().removeConnection(con);
++    }
++
++    @Override
++    public String toString() {
++        return "[" + con.getAddress() + "|" + con.getName() + "] -> HS Upstream";
++    }
++
++    private static final byte[] RESET_ACK = "lightfall:ack".getBytes(StandardCharsets.UTF_8);
++
++    private static boolean isAckPacket(LoginPayloadResponse response) {
++        return Arrays.equals(response.getData(), RESET_ACK);
++    }
++}
+diff --git a/proxy/src/main/java/net/md_5/bungee/ServerConnector.java b/proxy/src/main/java/net/md_5/bungee/ServerConnector.java
+index 2d9c0cda..9e89f2dc 100644
+--- a/proxy/src/main/java/net/md_5/bungee/ServerConnector.java
++++ b/proxy/src/main/java/net/md_5/bungee/ServerConnector.java
+@@ -61,10 +61,10 @@ import net.md_5.bungee.util.QuietException;
+ public class ServerConnector extends PacketHandler
+ {
+ 
+-    private final ProxyServer bungee;
+-    private ChannelWrapper ch;
+-    private final UserConnection user;
+-    private final BungeeServerInfo target;
++    protected final ProxyServer bungee;
++    protected ChannelWrapper ch;
++    protected final UserConnection user;
++    protected final BungeeServerInfo target;
+     private State thisState = State.LOGIN_SUCCESS;
+     @Getter
+     private ForgeServerHandler handshakeHandler;
+diff --git a/proxy/src/main/java/net/md_5/bungee/UserConnection.java b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
+index 7ec119ea..fdbabd9e 100644
+--- a/proxy/src/main/java/net/md_5/bungee/UserConnection.java
++++ b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
+@@ -46,6 +46,8 @@ import net.md_5.bungee.entitymap.EntityMap;
+ import net.md_5.bungee.forge.ForgeClientHandler;
+ import net.md_5.bungee.forge.ForgeConstants;
+ import net.md_5.bungee.forge.ForgeServerHandler;
++import io.izzel.lightfall.forge.ModernForgeClientHandler;
++import io.izzel.lightfall.forge.ModernForgeServerConnector;
+ import net.md_5.bungee.netty.ChannelWrapper;
+ import net.md_5.bungee.netty.HandlerBoss;
+ import net.md_5.bungee.netty.PipelineUtils;
+@@ -168,6 +170,15 @@ public final class UserConnection implements ProxiedPlayer
+             addGroups( s );
+         }
+ 
++        // lightfall start
++        if (this.getPendingConnection().getExtraDataInHandshake().contains( ForgeConstants.MODERN_FML_HANDSHAKE_TOKEN ))
++        {
++            forgeClientHandler = new ModernForgeClientHandler(this);
++            forgeClientHandler.setFmlTokenInHandshake( true );
++            this.modernForge = true;
++        }
++        else {
++        // lightfall end
+         forgeClientHandler = new ForgeClientHandler( this );
+ 
+         // No-config FML handshake marker.
+@@ -176,6 +187,7 @@ public final class UserConnection implements ProxiedPlayer
+         {
+             forgeClientHandler.setFmlTokenInHandshake( true );
+         }
++        } // lightfall
+     }
+ 
+     public void sendPacket(PacketWrapper packet)
+@@ -344,7 +356,13 @@ public final class UserConnection implements ProxiedPlayer
+                 PipelineUtils.BASE.initChannel( ch );
+                 ch.pipeline().addAfter( PipelineUtils.FRAME_DECODER, PipelineUtils.PACKET_DECODER, new MinecraftDecoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
+                 ch.pipeline().addAfter( PipelineUtils.FRAME_PREPENDER, PipelineUtils.PACKET_ENCODER, new MinecraftEncoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
+-                ch.pipeline().get( HandlerBoss.class ).setHandler( new ServerConnector( bungee, UserConnection.this, target ) );
++                // lightfall start
++                if (isModernForge()) {
++                    ch.pipeline().get( HandlerBoss.class ).setHandler( new ModernForgeServerConnector( bungee, UserConnection.this, target ) );
++                } else {
++                    ch.pipeline().get( HandlerBoss.class ).setHandler( new ServerConnector( bungee, UserConnection.this, target ) );
++                }
++                // lightfall end
+             }
+         };
+         ChannelFutureListener listener = new ChannelFutureListener()
+@@ -368,7 +386,7 @@ public final class UserConnection implements ProxiedPlayer
+                     {
+                         sendMessage( bungee.getTranslation( "fallback_lobby" ) );
+                         connect( def, null, true, ServerConnectEvent.Reason.LOBBY_FALLBACK, request.getConnectTimeout() ); // Waterfall
+-                    } else if ( dimensionChange )
++                    } else if ( dimensionChange || isDuringModernHandshake() )
+                     {
+                         disconnect( bungee.getTranslation( "fallback_kick", future.cause().getClass().getName() ) );
+                     } else
+@@ -759,4 +777,13 @@ public final class UserConnection implements ProxiedPlayer
+         return entityRewrite == net.md_5.bungee.entitymap.EntityMap_Dummy.INSTANCE;
+     }
+     // Waterfall end
++    // lightfall start
++    @Getter
++    @Setter
++    private boolean modernForge = false;
++
++    public boolean isDuringModernHandshake() {
++        return this.modernForge && getCh().getHandle().pipeline().get(MinecraftEncoder.class).getProtocol() == Protocol.LOGIN;
++    }
++    // lightfall end
+ }
+diff --git a/proxy/src/main/java/net/md_5/bungee/forge/ForgeClientHandler.java b/proxy/src/main/java/net/md_5/bungee/forge/ForgeClientHandler.java
+index bea2bbff..6fca66a8 100644
+--- a/proxy/src/main/java/net/md_5/bungee/forge/ForgeClientHandler.java
++++ b/proxy/src/main/java/net/md_5/bungee/forge/ForgeClientHandler.java
+@@ -21,7 +21,7 @@ public class ForgeClientHandler
+ {
+ 
+     @NonNull
+-    private final UserConnection con;
++    protected final UserConnection con;
+ 
+     /**
+      * The users' mod list.
+diff --git a/proxy/src/main/java/net/md_5/bungee/forge/ForgeConstants.java b/proxy/src/main/java/net/md_5/bungee/forge/ForgeConstants.java
+index f5253b89..e8cfade0 100644
+--- a/proxy/src/main/java/net/md_5/bungee/forge/ForgeConstants.java
++++ b/proxy/src/main/java/net/md_5/bungee/forge/ForgeConstants.java
+@@ -22,6 +22,8 @@ public class ForgeConstants
+      * The FML 1.8 handshake token.
+      */
+     public static final String FML_HANDSHAKE_TOKEN = "\0FML\0";
++    public static final String MODERN_FML_HANDSHAKE_TOKEN = "\0FML2\0";
++    public static final PluginMessage MODERN_FML_RESET = new PluginMessage("lightfall:reset", new byte[]{0,0}, true);
+ 
+     public static final PluginMessage FML_RESET_HANDSHAKE = new PluginMessage( FML_HANDSHAKE_TAG, new byte[]
+     {
+-- 
+2.30.1.windows.1
+
