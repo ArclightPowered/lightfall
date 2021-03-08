@@ -29,4 +29,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: lightfall jars
-          path: ./lightfall-proxy/bootstrap/lightfall.jar
+          path: ./lightfall-proxy/bootstrap/target/lightfall.jar
