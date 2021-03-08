@@ -21,6 +21,7 @@ jobs:
           java-version: 1.8
       - name: Build with Maven
         run: |
+          git config --global user.name "GitHub Actions"
           git submodule update --recursive --init
           ./scripts/applyPatches.sh
           mvn -B clean package "-Dbuild.number=$GITHUB_RUN_NUMBER"
