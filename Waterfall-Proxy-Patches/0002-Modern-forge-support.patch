@@ -1,4 +1,4 @@
-From 8fe1b053c80cdbda76d6c1fe82fc66e38c17e636 Mon Sep 17 00:00:00 2001
+From e8ad36d950b0cc7ceeae083c9bace912a4b84d47 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 22:24:56 +0800
 Subject: [PATCH] Modern forge support
@@ -95,7 +95,7 @@ index 00000000..7a4a0317
 +}
 diff --git a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
 new file mode 100644
-index 00000000..c60da353
+index 00000000..d7bbd021
 --- /dev/null
 +++ b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
 @@ -0,0 +1,114 @@
@@ -178,7 +178,7 @@ index 00000000..c60da353
 +                user.getCh().getHandle().flush();
 +                user.getCh().write(ForgeConstants.MODERN_FML_RESET);
 +                user.getCh().setProtocol(Protocol.LOGIN);
-+                user.getCh().getHandle().pipeline().get(HandlerBoss.class).setHandler(new ModernForgeUpstreamBridge(bungee, user, this::onResetAck));
++                user.getCh().getHandle().pipeline().get(HandlerBoss.class).setHandler(new ModernForgeUpstreamBridge(bungee, user, this::onResetAck, () -> thisState == State.PENDING));
 +                if (user.getServer() != null) {
 +                    user.getServer().setObsolete(true);
 +                    user.getServer().disconnect("Quiting");
@@ -215,10 +215,10 @@ index 00000000..c60da353
 +}
 diff --git a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java
 new file mode 100644
-index 00000000..30e406d3
+index 00000000..51b0842f
 --- /dev/null
 +++ b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java
-@@ -0,0 +1,66 @@
+@@ -0,0 +1,72 @@
 +package io.izzel.lightfall.forge;
 +
 +import io.netty.handler.timeout.ReadTimeoutException;
@@ -231,10 +231,12 @@ index 00000000..30e406d3
 +import net.md_5.bungee.netty.ChannelWrapper;
 +import net.md_5.bungee.netty.PacketHandler;
 +import net.md_5.bungee.protocol.PacketWrapper;
++import net.md_5.bungee.protocol.Protocol;
 +import net.md_5.bungee.protocol.packet.LoginPayloadResponse;
 +
 +import java.nio.charset.StandardCharsets;
 +import java.util.Arrays;
++import java.util.function.BooleanSupplier;
 +
 +@RequiredArgsConstructor
 +public class ModernForgeUpstreamBridge extends PacketHandler {
@@ -242,6 +244,7 @@ index 00000000..30e406d3
 +    private final ProxyServer bungee;
 +    private final UserConnection con;
 +    private final Runnable onAck;
++    private final BooleanSupplier shouldSwitchProtocol;
 +
 +    @Override
 +    public boolean shouldHandle(PacketWrapper packet) throws Exception {
@@ -259,6 +262,9 @@ index 00000000..30e406d3
 +
 +    @Override
 +    public void exception(Throwable t) throws Exception {
++        if (shouldSwitchProtocol.getAsBoolean()) {
++            con.getCh().setProtocol(Protocol.GAME);
++        }
 +        if (t instanceof ReadTimeoutException) {
 +            con.disconnect("You need to install lightfall client mod to join this server!");
 +        } else {

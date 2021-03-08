@@ -1,4 +1,4 @@
-From 48a9a1424461d43527dbfb636b62a05bbb543556 Mon Sep 17 00:00:00 2001
+From a6a5b3de4db32f61da3da0c50bf2dce854a642d6 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 19:26:00 +0800
 Subject: [PATCH] Change brand to lightfall
@@ -557,6 +557,19 @@ index 65121ba2..9b7e9916 100644
              boolean restricted = get( "restricted", false, val );
              SocketAddress address = Util.getAddr( addr );
              ServerInfo info = ProxyServer.getInstance().constructServerInfo( name, address, motd, restricted );
+diff --git a/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java b/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java
+index 338c30d3..d143023a 100644
+--- a/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java
++++ b/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java
+@@ -22,7 +22,7 @@ public class JenkinsModuleSource implements ModuleSource
+                 "https://papermc.io/api/v2/projects/%1$s/versions/%2$s/builds/%3$s/downloads/%4$s-%2$s-%3$s.jar",
+                 "waterfall",
+                 net.md_5.bungee.api.ProxyServer.getInstance().getVersion().split(":")[2].split("-")[0],
+-                version.getBuild(),
++                403,
+                 module.getName()
+             );
+             URL website = new URL( url );
 diff --git a/query/pom.xml b/query/pom.xml
 index 8ce88f4a..40e7ae33 100644
 --- a/query/pom.xml
