@@ -1,0 +1,22 @@
+From 0bf64f6229a9f94a3d0a5c85fd02b1e6964c10f3 Mon Sep 17 00:00:00 2001
+From: IzzelAliz <csh2001331@126.com>
+Date: Mon, 8 Mar 2021 11:55:11 +0800
+Subject: [PATCH] Use fixed module version
+
+
+diff --git a/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java b/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java
+index 338c30d3..d143023a 100644
+--- a/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java
++++ b/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java
+@@ -22,7 +22,7 @@ public class JenkinsModuleSource implements ModuleSource
+                 "https://papermc.io/api/v2/projects/%1$s/versions/%2$s/builds/%3$s/downloads/%4$s-%2$s-%3$s.jar",
+                 "waterfall",
+                 net.md_5.bungee.api.ProxyServer.getInstance().getVersion().split(":")[2].split("-")[0],
+-                version.getBuild(),
++                403,
+                 module.getName()
+             );
+             URL website = new URL( url );
+-- 
+2.30.1.windows.1
+

@@ -1,0 +1,31 @@
+name: Build lightfall
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Build with Maven
+        run: |
+          git submodule update --recursive --init
+          ./scripts/applyPatches.sh
+          mvn -B clean package "-Dbuild.number=$GITHUB_RUN_NUMBER"
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: lightfall jars
+          path: ./lightfall-proxy/bootstrap/lightfall.jar
