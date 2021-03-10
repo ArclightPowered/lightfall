@@ -209,4 +209,5 @@ out/
 logs/
 config.yml
 waterfall.yml
-
+modules
+plugins
