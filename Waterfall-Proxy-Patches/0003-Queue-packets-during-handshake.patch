@@ -1,0 +1,90 @@
+From 1ed65897d4cb2efe2332e0b22223665cd4fafe88 Mon Sep 17 00:00:00 2001
+From: IzzelAliz <csh2001331@126.com>
+Date: Sun, 14 Mar 2021 20:04:23 +0800
+Subject: [PATCH] Queue packets during handshake
+
+
+diff --git a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
+index 1713e7d5..0f5c1fa6 100644
+--- a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
++++ b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
+@@ -60,6 +60,7 @@ public class ModernForgeServerConnector extends ServerConnector {
+         if (thisState == State.ACK) {
+             user.unsafe().sendPacket(loginSuccess);
+             user.getCh().setProtocol(Protocol.GAME);
++            user.getCh().endHandshake();
+             user.getCh().getHandle().pipeline().get(HandlerBoss.class).setHandler(new UpstreamBridge(bungee, user));
+             thisState = State.PLAIN;
+         }
+@@ -79,6 +80,7 @@ public class ModernForgeServerConnector extends ServerConnector {
+                 user.getCh().getHandle().flush();
+                 user.getCh().write(ForgeConstants.MODERN_FML_RESET);
+                 user.getCh().setProtocol(Protocol.LOGIN);
++                user.getCh().beginHandshake();
+                 user.getCh().getHandle().pipeline().get(HandlerBoss.class).setHandler(new ModernForgeUpstreamBridge(bungee, user, this));
+                 if (user.getServer() != null) {
+                     user.getServer().setObsolete(true);
+diff --git a/proxy/src/main/java/net/md_5/bungee/netty/ChannelWrapper.java b/proxy/src/main/java/net/md_5/bungee/netty/ChannelWrapper.java
+index 6dc5633f..e9f03515 100644
+--- a/proxy/src/main/java/net/md_5/bungee/netty/ChannelWrapper.java
++++ b/proxy/src/main/java/net/md_5/bungee/netty/ChannelWrapper.java
+@@ -6,6 +6,9 @@ import io.netty.channel.ChannelFutureListener;
+ import io.netty.channel.ChannelHandler;
+ import io.netty.channel.ChannelHandlerContext;
+ import java.net.SocketAddress;
++import java.util.Objects;
++import java.util.Queue;
++import java.util.concurrent.ConcurrentLinkedQueue;
+ import java.util.concurrent.TimeUnit;
+ import lombok.Getter;
+ import lombok.Setter;
+@@ -16,6 +19,8 @@ import net.md_5.bungee.protocol.MinecraftEncoder;
+ import net.md_5.bungee.protocol.PacketWrapper;
+ import net.md_5.bungee.protocol.Protocol;
+ import net.md_5.bungee.protocol.packet.Kick;
++import net.md_5.bungee.protocol.packet.LoginPayloadRequest;
++import net.md_5.bungee.protocol.packet.LoginSuccess;
+ 
+ public class ChannelWrapper
+ {
+@@ -51,6 +56,17 @@ public class ChannelWrapper
+     {
+         if ( !closed )
+         {
++            // lightfall start
++            if (queueGamePacket) {
++                Object actual = packet instanceof PacketWrapper ? ((PacketWrapper) packet).packet : packet;
++                if (actual instanceof LoginPayloadRequest || actual instanceof Kick || actual instanceof LoginSuccess) {
++                    ch.writeAndFlush(actual, ch.voidPromise());
++                } else {
++                    packetQueue.add(packet);
++                }
++                return;
++            }
++            // lightfall end
+             if ( packet instanceof PacketWrapper )
+             {
+                 ( (PacketWrapper) packet ).setReleased( true );
+@@ -145,4 +161,19 @@ public class ChannelWrapper
+             ch.pipeline().remove( "decompress" );
+         }
+     }
++    // lightfall start
++    private volatile boolean queueGamePacket = false;
++    private final Queue<Object> packetQueue = new ConcurrentLinkedQueue<>();
++
++    public void beginHandshake() {
++        queueGamePacket = true;
++    }
++
++    public void endHandshake() {
++        queueGamePacket = false;
++        while (!packetQueue.isEmpty()) {
++            write(packetQueue.poll());
++        }
++    }
++    // lightfall end
+ }
+-- 
+2.17.1
+
