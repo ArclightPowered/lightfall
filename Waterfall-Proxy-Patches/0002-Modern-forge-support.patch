@@ -1,4 +1,4 @@
-From c287fd7055adf5491a2b28ff605b8f1e0df59886 Mon Sep 17 00:00:00 2001
+From 8562f37fb009c6ee58193c8edb915ed6ef04e12b Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 22:24:56 +0800
 Subject: [PATCH] Modern forge support
@@ -24,7 +24,7 @@ index d4b03843..5d0ca482 100644
      private Protocol protocol;
      private boolean server;
 diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
-index 26edbca8..f9a18aca 100644
+index 26edbca8..e92f3d52 100644
 --- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
 +++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
 @@ -498,6 +498,19 @@ public class Commands extends DefinedPacket
@@ -47,13 +47,14 @@ index 26edbca8..f9a18aca 100644
  
          static
          {
-@@ -551,6 +564,10 @@ public class Commands extends DefinedPacket
+@@ -551,6 +564,11 @@ public class Commands extends DefinedPacket
              PROVIDERS.put( "minecraft:test_argument", VOID ); // 1.16, debug
              PROVIDERS.put( "minecraft:test_class", VOID ); // 1.16, debug
              PROVIDERS.put( "minecraft:angle", VOID ); // 1.16.2
 +            // lightfall start
 +            PROVIDERS.put( "forge:enum", FORGE_ENUM );
 +            PROVIDERS.put( "forge:modid", VOID );
++            PROVIDERS.put( "minecraft:", VOID );
 +            // lightfall end
          }
  
