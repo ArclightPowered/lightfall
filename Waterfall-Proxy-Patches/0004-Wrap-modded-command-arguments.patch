@@ -1,0 +1,125 @@
+From 8573f23155004d770499d019aea5ed8d48dd5aed Mon Sep 17 00:00:00 2001
+From: IzzelAliz <csh2001331@126.com>
+Date: Wed, 5 May 2021 23:50:01 +0800
+Subject: [PATCH] Wrap modded command arguments
+
+
+diff --git a/protocol/src/main/java/io/izzel/lightfall/forge/WrappedArgumentType.java b/protocol/src/main/java/io/izzel/lightfall/forge/WrappedArgumentType.java
+new file mode 100644
+index 00000000..f47dcd09
+--- /dev/null
++++ b/protocol/src/main/java/io/izzel/lightfall/forge/WrappedArgumentType.java
+@@ -0,0 +1,20 @@
++package io.izzel.lightfall.forge;
++
++import com.mojang.brigadier.StringReader;
++import com.mojang.brigadier.arguments.ArgumentType;
++import com.mojang.brigadier.exceptions.CommandSyntaxException;
++import lombok.Data;
++import lombok.RequiredArgsConstructor;
++
++@RequiredArgsConstructor
++@Data
++public class WrappedArgumentType implements ArgumentType<Object> {
++
++    public final String actualKey;
++    public final byte[] actualPayload;
++
++    @Override
++    public Object parse(StringReader stringReader) throws CommandSyntaxException {
++        throw new UnsupportedOperationException("Not supported.");
++    }
++}
+diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
+index e92f3d52..e1e7f4cc 100644
+--- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
++++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
+@@ -21,6 +21,7 @@ import com.mojang.brigadier.tree.ArgumentCommandNode;
+ import com.mojang.brigadier.tree.CommandNode;
+ import com.mojang.brigadier.tree.LiteralCommandNode;
+ import com.mojang.brigadier.tree.RootCommandNode;
++import io.izzel.lightfall.forge.WrappedArgumentType;
+ import io.netty.buffer.ByteBuf;
+ import java.util.ArrayDeque;
+ import java.util.Collection;
+@@ -510,6 +511,29 @@ public class Commands extends DefinedPacket
+                 writeString(enumClass, buf);
+             }
+         };
++        private static final ProperArgumentSerializer<WrappedArgumentType> ARCLIGHT_WRAP = new ProperArgumentSerializer<WrappedArgumentType>() {
++            @Override
++            protected String getKey() {
++                throw new IllegalStateException();
++            }
++
++            @Override
++            protected String getKey(WrappedArgumentType t) {
++                return t.actualKey;
++            }
++
++            @Override
++            protected WrappedArgumentType read(ByteBuf buf) {
++                String actualKey = readString(buf);
++                byte[] bytes = readArray(buf);
++                return new WrappedArgumentType(actualKey, bytes);
++            }
++
++            @Override
++            protected void write(ByteBuf buf, WrappedArgumentType t) {
++                buf.writeBytes(t.actualPayload);
++            }
++        };
+         // lightfall end
+ 
+         static
+@@ -568,6 +592,8 @@ public class Commands extends DefinedPacket
+             PROVIDERS.put( "forge:enum", FORGE_ENUM );
+             PROVIDERS.put( "forge:modid", VOID );
+             PROVIDERS.put( "minecraft:", VOID );
++            PROVIDERS.put( "arclight:wrapped", ARCLIGHT_WRAP );
++            PROPER_PROVIDERS.put( WrappedArgumentType.class, ARCLIGHT_WRAP );
+             // lightfall end
+         }
+ 
+@@ -585,7 +611,7 @@ public class Commands extends DefinedPacket
+             ProperArgumentSerializer proper = PROPER_PROVIDERS.get( arg.getClass() );
+             if ( proper != null )
+             {
+-                writeString( proper.getKey(), buf );
++                writeString( proper.getKey(arg), buf ); // lightfall - use arg
+                 proper.write( buf, arg );
+             } else
+             {
+@@ -620,10 +646,15 @@ public class Commands extends DefinedPacket
+             protected abstract void write(ByteBuf buf, T t);
+         }
+ 
+-        private abstract static class ProperArgumentSerializer<T> extends ArgumentSerializer<T>
+-        {
++        private abstract static class ProperArgumentSerializer<T> extends ArgumentSerializer<T> {
+ 
+             protected abstract String getKey();
++
++            // lightfall begin
++            protected String getKey(T t) {
++                return getKey();
++            }
++            // lightfall end
+         }
+     }
+ 
+diff --git a/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java b/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java
+index 9e180c30..3fac7fc2 100644
+--- a/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java
++++ b/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java
+@@ -85,6 +85,7 @@ public class DownstreamBridge extends PacketHandler
+             // do not perform any actions if the user has already moved
+             return;
+         }
++        t.printStackTrace();
+ 
+         // Waterfall start
+         ServerInfo def = con.updateAndGetNextServer( server.getInfo() );
+-- 
+2.17.1
+
