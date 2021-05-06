@@ -1,0 +1,22 @@
+From c64b3b3b761d0afc5cc55332c135ba8e331f54af Mon Sep 17 00:00:00 2001
+From: IzzelAliz <csh2001331@126.com>
+Date: Thu, 6 May 2021 21:04:52 +0800
+Subject: [PATCH] Accept all suggestion types
+
+
+diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
+index e1e7f4cc..cfcb3abc 100644
+--- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
++++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
+@@ -681,7 +681,7 @@ public class Commands extends DefinedPacket
+ 
+         private static SuggestionProvider<DummyProvider> getProvider(String key)
+         {
+-            SuggestionProvider<DummyProvider> provider = PROVIDERS.get( key );
++            SuggestionProvider<DummyProvider> provider = PROVIDERS.computeIfAbsent( key, DummyProvider::new ); // lightfall - accept any suggestion
+             Preconditions.checkArgument( provider != null, "Unknown completion provider " + key );
+ 
+             return provider;
+-- 
+2.17.1
+
