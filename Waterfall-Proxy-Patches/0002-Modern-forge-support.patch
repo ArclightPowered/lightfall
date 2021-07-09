@@ -1,4 +1,4 @@
-From 8562f37fb009c6ee58193c8edb915ed6ef04e12b Mon Sep 17 00:00:00 2001
+From 67b7ef6cbf6cf92ba7eecb27ddd8970ad0677c90 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 22:24:56 +0800
 Subject: [PATCH] Modern forge support
@@ -298,10 +298,10 @@ index 00000000..5e5432ec
 +    }
 +}
 diff --git a/proxy/src/main/java/net/md_5/bungee/ServerConnector.java b/proxy/src/main/java/net/md_5/bungee/ServerConnector.java
-index 2d9c0cda..9e89f2dc 100644
+index a5efb0af..aacf7bde 100644
 --- a/proxy/src/main/java/net/md_5/bungee/ServerConnector.java
 +++ b/proxy/src/main/java/net/md_5/bungee/ServerConnector.java
-@@ -61,10 +61,10 @@ import net.md_5.bungee.util.QuietException;
+@@ -62,10 +62,10 @@ import net.md_5.bungee.util.QuietException;
  public class ServerConnector extends PacketHandler
  {
  
@@ -317,10 +317,10 @@ index 2d9c0cda..9e89f2dc 100644
      @Getter
      private ForgeServerHandler handshakeHandler;
 diff --git a/proxy/src/main/java/net/md_5/bungee/UserConnection.java b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
-index 7ec119ea..fdbabd9e 100644
+index fc98b4b1..8ec90a1c 100644
 --- a/proxy/src/main/java/net/md_5/bungee/UserConnection.java
 +++ b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
-@@ -46,6 +46,8 @@ import net.md_5.bungee.entitymap.EntityMap;
+@@ -47,6 +47,8 @@ import net.md_5.bungee.entitymap.EntityMap;
  import net.md_5.bungee.forge.ForgeClientHandler;
  import net.md_5.bungee.forge.ForgeConstants;
  import net.md_5.bungee.forge.ForgeServerHandler;
@@ -329,7 +329,7 @@ index 7ec119ea..fdbabd9e 100644
  import net.md_5.bungee.netty.ChannelWrapper;
  import net.md_5.bungee.netty.HandlerBoss;
  import net.md_5.bungee.netty.PipelineUtils;
-@@ -168,6 +170,15 @@ public final class UserConnection implements ProxiedPlayer
+@@ -172,6 +174,15 @@ public final class UserConnection implements ProxiedPlayer
              addGroups( s );
          }
  
@@ -345,7 +345,7 @@ index 7ec119ea..fdbabd9e 100644
          forgeClientHandler = new ForgeClientHandler( this );
  
          // No-config FML handshake marker.
-@@ -176,6 +187,7 @@ public final class UserConnection implements ProxiedPlayer
+@@ -180,6 +191,7 @@ public final class UserConnection implements ProxiedPlayer
          {
              forgeClientHandler.setFmlTokenInHandshake( true );
          }
@@ -353,7 +353,7 @@ index 7ec119ea..fdbabd9e 100644
      }
  
      public void sendPacket(PacketWrapper packet)
-@@ -344,7 +356,13 @@ public final class UserConnection implements ProxiedPlayer
+@@ -348,7 +360,13 @@ public final class UserConnection implements ProxiedPlayer
                  PipelineUtils.BASE.initChannel( ch );
                  ch.pipeline().addAfter( PipelineUtils.FRAME_DECODER, PipelineUtils.PACKET_DECODER, new MinecraftDecoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
                  ch.pipeline().addAfter( PipelineUtils.FRAME_PREPENDER, PipelineUtils.PACKET_ENCODER, new MinecraftEncoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
@@ -368,16 +368,16 @@ index 7ec119ea..fdbabd9e 100644
              }
          };
          ChannelFutureListener listener = new ChannelFutureListener()
-@@ -368,7 +386,7 @@ public final class UserConnection implements ProxiedPlayer
+@@ -372,7 +390,7 @@ public final class UserConnection implements ProxiedPlayer
                      {
                          sendMessage( bungee.getTranslation( "fallback_lobby" ) );
                          connect( def, null, true, ServerConnectEvent.Reason.LOBBY_FALLBACK, request.getConnectTimeout() ); // Waterfall
 -                    } else if ( dimensionChange )
 +                    } else if ( dimensionChange || isDuringModernHandshake() )
                      {
-                         disconnect( bungee.getTranslation( "fallback_kick", future.cause().getClass().getName() ) );
+                         disconnect( bungee.getTranslation( "fallback_kick", connectionFailMessage( future.cause() ) ) );
                      } else
-@@ -759,4 +777,13 @@ public final class UserConnection implements ProxiedPlayer
+@@ -774,4 +792,13 @@ public final class UserConnection implements ProxiedPlayer
          return entityRewrite == net.md_5.bungee.entitymap.EntityMap_Dummy.INSTANCE;
      }
      // Waterfall end
@@ -418,5 +418,5 @@ index f5253b89..e8cfade0 100644
      public static final PluginMessage FML_RESET_HANDSHAKE = new PluginMessage( FML_HANDSHAKE_TAG, new byte[]
      {
 -- 
-2.17.1
+2.30.1.windows.1
 
