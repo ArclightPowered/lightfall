@@ -1,14 +1,14 @@
-From cc9d2257db8ae287cfe7b17d64da99a5527e6a94 Mon Sep 17 00:00:00 2001
+From 6f08a06dd6c6a47ca47003994b6bafc6297c03b4 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 19:26:00 +0800
 Subject: [PATCH] Change brand to lightfall
 
 
 diff --git a/api/pom.xml b/api/pom.xml
-index 0680a5a5..4a790fe7 100644
+index 0680a5a5..ecb67cb3 100644
 --- a/api/pom.xml
 +++ b/api/pom.xml
-@@ -4,42 +4,41 @@
+@@ -4,42 +4,47 @@
      <modelVersion>4.0.0</modelVersion>
  
      <parent>
@@ -21,8 +21,7 @@ index 0680a5a5..4a790fe7 100644
      </parent>
  
 -    <groupId>io.github.waterfallmc</groupId>
--    <artifactId>waterfall-api</artifactId>
-+    <artifactId>lightfall-api</artifactId>
+     <artifactId>waterfall-api</artifactId>
      <version>1.17-R0.1-SNAPSHOT</version>
      <packaging>jar</packaging>
  
@@ -30,6 +29,12 @@ index 0680a5a5..4a790fe7 100644
 +    <name>lightfall-API</name>
      <description>API implemented by the Elastic Portal Suite</description>
  
++    <repositories>
++        <repository>
++            <id>IzzelAliz</id>
++            <url>https://maven.izzel.io/releases</url>
++        </repository>
++    </repositories>
      <dependencies>
          <dependency>
 -            <groupId>io.github.waterfallmc</groupId>
@@ -63,6 +68,18 @@ index 0680a5a5..4a790fe7 100644
              <version>${project.version}</version>
              <scope>compile</scope>
          </dependency>
+@@ -82,5 +87,11 @@
+             <artifactId>slf4j-api</artifactId>
+             <version>1.7.25</version>
+         </dependency>
++        <!-- lightfall - Add API -->
++        <dependency>
++            <groupId>io.izzel.lightfall</groupId>
++            <artifactId>lightfall-api</artifactId>
++            <version>1.0.0</version>
++        </dependency>
+     </dependencies>
+ </project>
 diff --git a/bootstrap/pom.xml b/bootstrap/pom.xml
 index 7a9e8258..1dc17920 100644
 --- a/bootstrap/pom.xml
@@ -271,7 +288,7 @@ index 7ec6e530..33f9cfdc 100644
  
      <properties>
 diff --git a/module/pom.xml b/module/pom.xml
-index 0ef98d58..91503ceb 100644
+index 0ef98d58..a991abf8 100644
 --- a/module/pom.xml
 +++ b/module/pom.xml
 @@ -4,8 +4,8 @@
@@ -294,17 +311,15 @@ index 0ef98d58..91503ceb 100644
      <description>Parent project for all Waterfall modules.</description>
  
      <modules>
-@@ -35,8 +35,8 @@
+@@ -35,7 +35,7 @@
  
      <dependencies>
          <dependency>
 -            <groupId>io.github.waterfallmc</groupId>
--            <artifactId>waterfall-api</artifactId>
 +            <groupId>io.izzel.lightfall</groupId>
-+            <artifactId>lightfall-api</artifactId>
+             <artifactId>waterfall-api</artifactId>
              <version>${project.version}</version>
              <scope>compile</scope>
-         </dependency>
 diff --git a/native/pom.xml b/native/pom.xml
 index 652a869d..8c983ee9 100644
 --- a/native/pom.xml
@@ -437,7 +452,7 @@ index dbc0a3ab..a0f912c5 100644
              <scope>compile</scope>
          </dependency>
 diff --git a/proxy/pom.xml b/proxy/pom.xml
-index c3a2eeb6..de6d72bd 100644
+index c3a2eeb6..fc6de463 100644
 --- a/proxy/pom.xml
 +++ b/proxy/pom.xml
 @@ -4,18 +4,17 @@
@@ -468,9 +483,8 @@ index c3a2eeb6..de6d72bd 100644
          </dependency>
          <dependency>
 -            <groupId>io.github.waterfallmc</groupId>
--            <artifactId>waterfall-api</artifactId>
 +            <groupId>io.izzel.lightfall</groupId>
-+            <artifactId>lightfall-api</artifactId>
+             <artifactId>waterfall-api</artifactId>
              <version>${project.version}</version>
              <scope>compile</scope>
          </dependency>
@@ -571,7 +585,7 @@ index 338c30d3..211fbbaf 100644
              );
              URL website = new URL( url );
 diff --git a/query/pom.xml b/query/pom.xml
-index dea7d85f..33a57d6b 100644
+index dea7d85f..349d41e3 100644
 --- a/query/pom.xml
 +++ b/query/pom.xml
 @@ -4,18 +4,17 @@
@@ -597,17 +611,15 @@ index dea7d85f..33a57d6b 100644
      <description>Minecraft query implementation based on the Waterfall API.</description>
  
      <dependencies>
-@@ -26,8 +25,8 @@
+@@ -26,7 +25,7 @@
              <scope>compile</scope>
          </dependency>
          <dependency>
 -            <groupId>io.github.waterfallmc</groupId>
--            <artifactId>waterfall-api</artifactId>
 +            <groupId>io.izzel.lightfall</groupId>
-+            <artifactId>lightfall-api</artifactId>
+             <artifactId>waterfall-api</artifactId>
              <version>${project.version}</version>
              <scope>compile</scope>
-         </dependency>
 -- 
 2.30.1.windows.1
 

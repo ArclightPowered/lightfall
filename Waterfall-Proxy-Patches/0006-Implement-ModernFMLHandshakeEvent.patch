@@ -1,0 +1,79 @@
+From 72449e6a42e00c4205f9b89ae038d122c24866d7 Mon Sep 17 00:00:00 2001
+From: IzzelAliz <csh2001331@126.com>
+Date: Fri, 9 Jul 2021 15:58:58 +0800
+Subject: [PATCH] Implement ModernFMLHandshakeEvent
+
+
+diff --git a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
+index 0f5c1fa6..f8788696 100644
+--- a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
++++ b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
+@@ -1,6 +1,7 @@
+ package io.izzel.lightfall.forge;
+ 
+ import com.google.common.base.Preconditions;
++import io.izzel.lightfall.api.event.ModernFMLHandshakeEvent;
+ import lombok.Getter;
+ import net.md_5.bungee.BungeeServerInfo;
+ import net.md_5.bungee.ServerConnector;
+@@ -10,6 +11,7 @@ import net.md_5.bungee.connection.UpstreamBridge;
+ import net.md_5.bungee.forge.ForgeConstants;
+ import net.md_5.bungee.netty.ChannelWrapper;
+ import net.md_5.bungee.netty.HandlerBoss;
++import net.md_5.bungee.protocol.DefinedPacket;
+ import net.md_5.bungee.protocol.PacketWrapper;
+ import net.md_5.bungee.protocol.Protocol;
+ import net.md_5.bungee.protocol.packet.EncryptionResponse;
+@@ -93,7 +95,7 @@ public class ModernForgeServerConnector extends ServerConnector {
+                 break;
+             }
+             case ACK: {
+-                user.unsafe().sendPacket(request);
++                writePacket(request);
+                 break;
+             }
+         }
+@@ -102,11 +104,17 @@ public class ModernForgeServerConnector extends ServerConnector {
+     public void onResetAck() {
+         Preconditions.checkState(thisState == State.PENDING, "Not expecting PENDING");
+         while (!pendingHandshakes.isEmpty()) {
+-            user.unsafe().sendPacket(pendingHandshakes.poll());
++            writePacket(pendingHandshakes.poll());
+         }
+         thisState = State.ACK;
+     }
+ 
++    private void writePacket(LoginPayloadRequest packet) {
++        if (new ModernFMLHandshakeEvent.Request(packet).callEvent()) {
++            user.unsafe().sendPacket(packet);
++        }
++    }
++
+     public ChannelWrapper getChannel() {
+         return this.ch;
+     }
+diff --git a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java
+index 5e5432ec..ce3201c3 100644
+--- a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java
++++ b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java
+@@ -1,5 +1,6 @@
+ package io.izzel.lightfall.forge;
+ 
++import io.izzel.lightfall.api.event.ModernFMLHandshakeEvent;
+ import io.netty.handler.timeout.ReadTimeoutException;
+ import lombok.RequiredArgsConstructor;
+ import net.md_5.bungee.BungeeCord;
+@@ -33,7 +34,9 @@ public class ModernForgeUpstreamBridge extends PacketHandler {
+         if (isAckPacket(response)) {
+             server.onResetAck();
+         } else {
+-            con.getForgeServerHandler().getCh().write(response);
++            if (new ModernFMLHandshakeEvent.Response(response).callEvent()) {
++                con.getForgeServerHandler().getCh().write(response);
++            }
+         }
+     }
+ 
+-- 
+2.30.1.windows.1
+
