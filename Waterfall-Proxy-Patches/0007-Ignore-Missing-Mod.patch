@@ -1,0 +1,18 @@
+diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
+index cfcb3abc..7196c5fd 100644
+--- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
++++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
+@@ -600,7 +600,12 @@ public class Commands extends DefinedPacket
+         private static ArgumentType<?> read(String key, ByteBuf buf)
+         {
+             ArgumentSerializer reader = PROVIDERS.get( key );
+-            Preconditions.checkArgument( reader != null, "No provider for argument " + key );
++
++            // lightfall start
++            if(reader == null){
++                reader = VOID;
++            }
++            // lightfall end
+ 
+             Object val = reader.read( buf );
+             return val != null && PROPER_PROVIDERS.containsKey( val.getClass() ) ? (ArgumentType<?>) val : new DummyType( key, reader, val );
