@@ -1,4 +1,4 @@
-From 67b7ef6cbf6cf92ba7eecb27ddd8970ad0677c90 Mon Sep 17 00:00:00 2001
+From 2415cf563f24ec8ae7759ecaccb13cf00bcd228e Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 22:24:56 +0800
 Subject: [PATCH] Modern forge support
@@ -60,10 +60,10 @@ index 26edbca8..e92f3d52 100644
  
          private static ArgumentType<?> read(String key, ByteBuf buf)
 diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/PluginMessage.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/PluginMessage.java
-index 17e12655..966f39cc 100644
+index 4f3a8c72..5de2c123 100644
 --- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/PluginMessage.java
 +++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/PluginMessage.java
-@@ -46,7 +46,7 @@ public class PluginMessage extends DefinedPacket
+@@ -45,7 +45,7 @@ public class PluginMessage extends DefinedPacket
                  return tag;
              }
  
@@ -71,7 +71,7 @@ index 17e12655..966f39cc 100644
 +            return "legacy:" + tag.toLowerCase( Locale.ROOT ).replace("|", ""); // Lightfall - remove illegal characters
          }
      };
-     public static final Predicate<PluginMessage> SHOULD_RELAY = new Predicate<PluginMessage>()
+ 
 diff --git a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeClientHandler.java b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeClientHandler.java
 new file mode 100644
 index 00000000..7a4a0317
@@ -298,10 +298,10 @@ index 00000000..5e5432ec
 +    }
 +}
 diff --git a/proxy/src/main/java/net/md_5/bungee/ServerConnector.java b/proxy/src/main/java/net/md_5/bungee/ServerConnector.java
-index a5efb0af..aacf7bde 100644
+index 9e74d158..053e7885 100644
 --- a/proxy/src/main/java/net/md_5/bungee/ServerConnector.java
 +++ b/proxy/src/main/java/net/md_5/bungee/ServerConnector.java
-@@ -62,10 +62,10 @@ import net.md_5.bungee.util.QuietException;
+@@ -64,10 +64,10 @@ import net.md_5.bungee.util.QuietException;
  public class ServerConnector extends PacketHandler
  {
  
@@ -317,7 +317,7 @@ index a5efb0af..aacf7bde 100644
      @Getter
      private ForgeServerHandler handshakeHandler;
 diff --git a/proxy/src/main/java/net/md_5/bungee/UserConnection.java b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
-index fc98b4b1..8ec90a1c 100644
+index 871a2990..d3d70b89 100644
 --- a/proxy/src/main/java/net/md_5/bungee/UserConnection.java
 +++ b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
 @@ -47,6 +47,8 @@ import net.md_5.bungee.entitymap.EntityMap;
@@ -329,7 +329,7 @@ index fc98b4b1..8ec90a1c 100644
  import net.md_5.bungee.netty.ChannelWrapper;
  import net.md_5.bungee.netty.HandlerBoss;
  import net.md_5.bungee.netty.PipelineUtils;
-@@ -172,6 +174,15 @@ public final class UserConnection implements ProxiedPlayer
+@@ -169,6 +171,15 @@ public final class UserConnection implements ProxiedPlayer
              addGroups( s );
          }
  
@@ -345,7 +345,7 @@ index fc98b4b1..8ec90a1c 100644
          forgeClientHandler = new ForgeClientHandler( this );
  
          // No-config FML handshake marker.
-@@ -180,6 +191,7 @@ public final class UserConnection implements ProxiedPlayer
+@@ -177,6 +188,7 @@ public final class UserConnection implements ProxiedPlayer
          {
              forgeClientHandler.setFmlTokenInHandshake( true );
          }
@@ -353,7 +353,7 @@ index fc98b4b1..8ec90a1c 100644
      }
  
      public void sendPacket(PacketWrapper packet)
-@@ -348,7 +360,13 @@ public final class UserConnection implements ProxiedPlayer
+@@ -345,7 +357,13 @@ public final class UserConnection implements ProxiedPlayer
                  PipelineUtils.BASE.initChannel( ch );
                  ch.pipeline().addAfter( PipelineUtils.FRAME_DECODER, PipelineUtils.PACKET_DECODER, new MinecraftDecoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
                  ch.pipeline().addAfter( PipelineUtils.FRAME_PREPENDER, PipelineUtils.PACKET_ENCODER, new MinecraftEncoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
@@ -368,7 +368,7 @@ index fc98b4b1..8ec90a1c 100644
              }
          };
          ChannelFutureListener listener = new ChannelFutureListener()
-@@ -372,7 +390,7 @@ public final class UserConnection implements ProxiedPlayer
+@@ -369,7 +387,7 @@ public final class UserConnection implements ProxiedPlayer
                      {
                          sendMessage( bungee.getTranslation( "fallback_lobby" ) );
                          connect( def, null, true, ServerConnectEvent.Reason.LOBBY_FALLBACK, request.getConnectTimeout() ); // Waterfall
@@ -377,7 +377,7 @@ index fc98b4b1..8ec90a1c 100644
                      {
                          disconnect( bungee.getTranslation( "fallback_kick", connectionFailMessage( future.cause() ) ) );
                      } else
-@@ -774,4 +792,13 @@ public final class UserConnection implements ProxiedPlayer
+@@ -771,4 +789,13 @@ public final class UserConnection implements ProxiedPlayer
          return entityRewrite == net.md_5.bungee.entitymap.EntityMap_Dummy.INSTANCE;
      }
      // Waterfall end
@@ -418,5 +418,5 @@ index f5253b89..e8cfade0 100644
      public static final PluginMessage FML_RESET_HANDSHAKE = new PluginMessage( FML_HANDSHAKE_TAG, new byte[]
      {
 -- 
-2.30.1.windows.1
+2.17.1
 
