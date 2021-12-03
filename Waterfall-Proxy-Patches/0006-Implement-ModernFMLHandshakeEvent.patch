@@ -1,11 +1,24 @@
-From 72449e6a42e00c4205f9b89ae038d122c24866d7 Mon Sep 17 00:00:00 2001
+From 7baf1cccf82eb9c5020701a9cb9d2ebb7ec084a8 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Fri, 9 Jul 2021 15:58:58 +0800
 Subject: [PATCH] Implement ModernFMLHandshakeEvent
 
 
+diff --git a/api/pom.xml b/api/pom.xml
+index ecb67cb3..e058f8ab 100644
+--- a/api/pom.xml
++++ b/api/pom.xml
+@@ -91,7 +91,7 @@
+         <dependency>
+             <groupId>io.izzel.lightfall</groupId>
+             <artifactId>lightfall-api</artifactId>
+-            <version>1.0.0</version>
++            <version>1.1.1</version>
+         </dependency>
+     </dependencies>
+ </project>
 diff --git a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
-index 0f5c1fa6..f8788696 100644
+index 0f5c1fa6..55ad11e2 100644
 --- a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
 +++ b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeServerConnector.java
 @@ -1,6 +1,7 @@
@@ -33,7 +46,7 @@ index 0f5c1fa6..f8788696 100644
                  break;
              }
          }
-@@ -102,11 +104,17 @@ public class ModernForgeServerConnector extends ServerConnector {
+@@ -102,11 +104,22 @@ public class ModernForgeServerConnector extends ServerConnector {
      public void onResetAck() {
          Preconditions.checkState(thisState == State.PENDING, "Not expecting PENDING");
          while (!pendingHandshakes.isEmpty()) {
@@ -44,16 +57,30 @@ index 0f5c1fa6..f8788696 100644
      }
  
 +    private void writePacket(LoginPayloadRequest packet) {
-+        if (new ModernFMLHandshakeEvent.Request(packet).callEvent()) {
++        ModernFMLHandshakeEvent.Request event = new ModernFMLHandshakeEvent.Request(user, target, packet);
++        if (event.callEvent()) {
 +            user.unsafe().sendPacket(packet);
++        } else {
++            if (event.getResponse() != null) {
++                user.getForgeServerHandler().getCh().write(event.getResponse());
++            }
 +        }
 +    }
 +
      public ChannelWrapper getChannel() {
          return this.ch;
      }
+@@ -119,4 +132,8 @@ public class ModernForgeServerConnector extends ServerConnector {
+             return super.toString();
+         }
+     }
++
++    public BungeeServerInfo getTarget() {
++        return this.target;
++    }
+ }
 diff --git a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java
-index 5e5432ec..ce3201c3 100644
+index 5e5432ec..37e7a9a4 100644
 --- a/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java
 +++ b/proxy/src/main/java/io/izzel/lightfall/forge/ModernForgeUpstreamBridge.java
 @@ -1,5 +1,6 @@
@@ -68,12 +95,12 @@ index 5e5432ec..ce3201c3 100644
              server.onResetAck();
          } else {
 -            con.getForgeServerHandler().getCh().write(response);
-+            if (new ModernFMLHandshakeEvent.Response(response).callEvent()) {
++            if (new ModernFMLHandshakeEvent.Response(con, server.getTarget(), response).callEvent()) {
 +                con.getForgeServerHandler().getCh().write(response);
 +            }
          }
      }
  
 -- 
-2.30.1.windows.1
+2.17.1
 
