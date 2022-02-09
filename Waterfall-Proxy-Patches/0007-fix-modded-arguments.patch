@@ -1,0 +1,28 @@
+From 9cc80c8ca054dfc3ce0876cc61704174f2e074df Mon Sep 17 00:00:00 2001
+From: khj xiaogu <54445543+khjxiaogu@users.noreply.github.com>
+Date: Thu, 10 Feb 2022 01:25:08 +0800
+Subject: [PATCH] fix modded arguments
+
+
+diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
+index cfcb3abc..49a8cb92 100644
+--- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
++++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
+@@ -600,8 +600,12 @@ public class Commands extends DefinedPacket
+         private static ArgumentType<?> read(String key, ByteBuf buf)
+         {
+             ArgumentSerializer reader = PROVIDERS.get( key );
+-            Preconditions.checkArgument( reader != null, "No provider for argument " + key );
+-
++            //Preconditions.checkArgument( reader != null, "No provider for argument " + key );
++			// lightfall start
++			// Added this to prevent some mod's super special command argument break the whole server
++			if(reader == null)
++				reader = VOID;
++			// lightfall end
+             Object val = reader.read( buf );
+             return val != null && PROPER_PROVIDERS.containsKey( val.getClass() ) ? (ArgumentType<?>) val : new DummyType( key, reader, val );
+         }
+-- 
+2.26.2.windows.1
+
