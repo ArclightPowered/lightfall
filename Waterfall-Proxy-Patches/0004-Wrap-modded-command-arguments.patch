@@ -1,4 +1,4 @@
-From 8573f23155004d770499d019aea5ed8d48dd5aed Mon Sep 17 00:00:00 2001
+From 619b0b7aefe66a49604967f224e15725d1e72507 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Wed, 5 May 2021 23:50:01 +0800
 Subject: [PATCH] Wrap modded command arguments
@@ -31,7 +31,7 @@ index 00000000..f47dcd09
 +    }
 +}
 diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
-index e92f3d52..e1e7f4cc 100644
+index 10490a65..0bb33ffb 100644
 --- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
 +++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
 @@ -21,6 +21,7 @@ import com.mojang.brigadier.tree.ArgumentCommandNode;
@@ -42,7 +42,7 @@ index e92f3d52..e1e7f4cc 100644
  import io.netty.buffer.ByteBuf;
  import java.util.ArrayDeque;
  import java.util.Collection;
-@@ -510,6 +511,29 @@ public class Commands extends DefinedPacket
+@@ -524,6 +525,29 @@ public class Commands extends DefinedPacket
                  writeString(enumClass, buf);
              }
          };
@@ -72,7 +72,7 @@ index e92f3d52..e1e7f4cc 100644
          // lightfall end
  
          static
-@@ -568,6 +592,8 @@ public class Commands extends DefinedPacket
+@@ -584,6 +608,8 @@ public class Commands extends DefinedPacket
              PROVIDERS.put( "forge:enum", FORGE_ENUM );
              PROVIDERS.put( "forge:modid", VOID );
              PROVIDERS.put( "minecraft:", VOID );
@@ -81,7 +81,7 @@ index e92f3d52..e1e7f4cc 100644
              // lightfall end
          }
  
-@@ -585,7 +611,7 @@ public class Commands extends DefinedPacket
+@@ -601,7 +627,7 @@ public class Commands extends DefinedPacket
              ProperArgumentSerializer proper = PROPER_PROVIDERS.get( arg.getClass() );
              if ( proper != null )
              {
@@ -90,7 +90,7 @@ index e92f3d52..e1e7f4cc 100644
                  proper.write( buf, arg );
              } else
              {
-@@ -620,10 +646,15 @@ public class Commands extends DefinedPacket
+@@ -636,10 +662,15 @@ public class Commands extends DefinedPacket
              protected abstract void write(ByteBuf buf, T t);
          }
  
@@ -109,10 +109,10 @@ index e92f3d52..e1e7f4cc 100644
      }
  
 diff --git a/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java b/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java
-index 9e180c30..3fac7fc2 100644
+index 97c4b210..db50d0e4 100644
 --- a/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java
 +++ b/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java
-@@ -85,6 +85,7 @@ public class DownstreamBridge extends PacketHandler
+@@ -90,6 +90,7 @@ public class DownstreamBridge extends PacketHandler
              // do not perform any actions if the user has already moved
              return;
          }
@@ -121,5 +121,5 @@ index 9e180c30..3fac7fc2 100644
          // Waterfall start
          ServerInfo def = con.updateAndGetNextServer( server.getInfo() );
 -- 
-2.17.1
+2.36.1.windows.1
 

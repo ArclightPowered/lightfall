@@ -1,11 +1,11 @@
-From 3cf80e6589e421d592b95a3b4084def67243efdd Mon Sep 17 00:00:00 2001
+From 0db42c711ca90906065c1546179059ceef071862 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 19:26:00 +0800
 Subject: [PATCH] Change brand to lightfall
 
 
 diff --git a/api/pom.xml b/api/pom.xml
-index 9b29dfca..98d0030d 100644
+index 379b6023..5eda9133 100644
 --- a/api/pom.xml
 +++ b/api/pom.xml
 @@ -4,42 +4,47 @@
@@ -169,7 +169,7 @@ index 0ad5dd16..98b328c6 100644
  
      <dependencies>
 diff --git a/config/pom.xml b/config/pom.xml
-index 2caffc27..7a268a24 100644
+index 7d32ea69..1dee8d56 100644
 --- a/config/pom.xml
 +++ b/config/pom.xml
 @@ -4,18 +4,17 @@
@@ -261,7 +261,7 @@ index 465ebbf2..01f22ae8 100644
              <scope>compile</scope>
          </dependency>
 diff --git a/log4j/pom.xml b/log4j/pom.xml
-index 34740637..d41964cc 100644
+index 24a5f780..a094849b 100644
 --- a/log4j/pom.xml
 +++ b/log4j/pom.xml
 @@ -3,18 +3,17 @@
@@ -348,7 +348,7 @@ index 1eff2c93..ebd778b3 100644
  
      <dependencies>
 diff --git a/pom.xml b/pom.xml
-index 94fad2cc..409cab18 100644
+index 505d1d14..d2e17f1b 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -4,24 +4,23 @@
@@ -414,7 +414,7 @@ index 94fad2cc..409cab18 100644
  
      <distributionManagement>
 diff --git a/protocol/pom.xml b/protocol/pom.xml
-index c62e0175..4cae232e 100644
+index a783d9b0..b848b424 100644
 --- a/protocol/pom.xml
 +++ b/protocol/pom.xml
 @@ -4,18 +4,17 @@
@@ -439,8 +439,8 @@ index c62e0175..4cae232e 100644
 +    <name>lightfall-Protocol</name>
      <description>Minimal implementation of the Minecraft protocol for use in Waterfall</description>
  
-     <dependencies>
-@@ -26,8 +25,8 @@
+     <!-- We really shouldn't depend on external repositories, but at least this is the Central staging one -->
+@@ -41,8 +40,8 @@
              <scope>compile</scope>
          </dependency>
          <dependency>
@@ -452,7 +452,7 @@ index c62e0175..4cae232e 100644
              <scope>compile</scope>
          </dependency>
 diff --git a/proxy/pom.xml b/proxy/pom.xml
-index 22c4f71b..929d8ec8 100644
+index 23bfa61d..5276b3f8 100644
 --- a/proxy/pom.xml
 +++ b/proxy/pom.xml
 @@ -4,18 +4,17 @@
@@ -521,10 +521,10 @@ index 22c4f71b..929d8ec8 100644
              <scope>compile</scope>
          </dependency>
 diff --git a/proxy/src/main/java/net/md_5/bungee/BungeeCord.java b/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
-index 07d74c67..7294e161 100644
+index 9ef2b77a..e524136c 100644
 --- a/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
 +++ b/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
-@@ -539,7 +539,7 @@ public class BungeeCord extends ProxyServer
+@@ -536,7 +536,7 @@ public class BungeeCord extends ProxyServer
      @Override
      public String getName()
      {
@@ -621,5 +621,5 @@ index 081bff62..1f078635 100644
              <version>${project.version}</version>
              <scope>compile</scope>
 -- 
-2.17.1
+2.36.1.windows.1
 
