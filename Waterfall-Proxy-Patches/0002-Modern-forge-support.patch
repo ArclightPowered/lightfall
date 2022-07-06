@@ -1,9 +1,30 @@
-From 196c3377843608567a5df8de091718a84ed6069e Mon Sep 17 00:00:00 2001
+From 264a06c1824fdce348789ff3b4b0bcae1e01fb43 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 22:24:56 +0800
 Subject: [PATCH] Modern forge support
 
 
+diff --git a/api/src/main/java/net/md_5/bungee/api/ServerPing.java b/api/src/main/java/net/md_5/bungee/api/ServerPing.java
+index fc92a7b5..8ec48eeb 100644
+--- a/api/src/main/java/net/md_5/bungee/api/ServerPing.java
++++ b/api/src/main/java/net/md_5/bungee/api/ServerPing.java
+@@ -3,6 +3,8 @@ package net.md_5.bungee.api;
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.UUID;
++
++import com.google.gson.JsonObject;
+ import lombok.AllArgsConstructor;
+ import lombok.Data;
+ import lombok.NoArgsConstructor;
+@@ -101,6 +103,7 @@ public class ServerPing
+     // Right now, we don't get the mods from the user, so we just use a stock ModInfo object to
+     // create the server ping. Vanilla clients will ignore this.
+     private final ModInfo modinfo = new ModInfo();
++    private final JsonObject forgeData = null; // lightfall - modern forge ping data
+ 
+     @Deprecated
+     public ServerPing(Protocol version, Players players, String description, String favicon)
 diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/MinecraftEncoder.java b/protocol/src/main/java/net/md_5/bungee/protocol/MinecraftEncoder.java
 index d4b03843..5d0ca482 100644
 --- a/protocol/src/main/java/net/md_5/bungee/protocol/MinecraftEncoder.java
@@ -317,7 +338,7 @@ index 9e74d158..053e7885 100644
      @Getter
      private ForgeServerHandler handshakeHandler;
 diff --git a/proxy/src/main/java/net/md_5/bungee/UserConnection.java b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
-index 7c52ee9a..a2b7c080 100644
+index 7c52ee9a..be6065bd 100644
 --- a/proxy/src/main/java/net/md_5/bungee/UserConnection.java
 +++ b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
 @@ -46,6 +46,8 @@ import net.md_5.bungee.entitymap.EntityMap;
@@ -329,12 +350,13 @@ index 7c52ee9a..a2b7c080 100644
  import net.md_5.bungee.netty.ChannelWrapper;
  import net.md_5.bungee.netty.HandlerBoss;
  import net.md_5.bungee.netty.PipelineUtils;
-@@ -168,6 +170,15 @@ public final class UserConnection implements ProxiedPlayer
+@@ -168,6 +170,16 @@ public final class UserConnection implements ProxiedPlayer
              addGroups( s );
          }
  
 +        // lightfall start
-+        if (this.getPendingConnection().getExtraDataInHandshake().contains( ForgeConstants.MODERN_FML_HANDSHAKE_TOKEN ))
++        if (this.getPendingConnection().getExtraDataInHandshake().contains( ForgeConstants.MODERN_FML_HANDSHAKE_TOKEN )
++            || this.getPendingConnection().getExtraDataInHandshake().contains( ForgeConstants.MODERN_FML_NET_3 ))
 +        {
 +            forgeClientHandler = new ModernForgeClientHandler(this);
 +            forgeClientHandler.setFmlTokenInHandshake( true );
@@ -345,7 +367,7 @@ index 7c52ee9a..a2b7c080 100644
          forgeClientHandler = new ForgeClientHandler( this );
  
          // No-config FML handshake marker.
-@@ -176,6 +187,7 @@ public final class UserConnection implements ProxiedPlayer
+@@ -176,6 +188,7 @@ public final class UserConnection implements ProxiedPlayer
          {
              forgeClientHandler.setFmlTokenInHandshake( true );
          }
@@ -353,7 +375,7 @@ index 7c52ee9a..a2b7c080 100644
      }
  
      public void sendPacket(PacketWrapper packet)
-@@ -348,7 +360,13 @@ public final class UserConnection implements ProxiedPlayer
+@@ -348,7 +361,13 @@ public final class UserConnection implements ProxiedPlayer
                  PipelineUtils.BASE.initChannel( ch );
                  ch.pipeline().addAfter( PipelineUtils.FRAME_DECODER, PipelineUtils.PACKET_DECODER, new MinecraftDecoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
                  ch.pipeline().addAfter( PipelineUtils.FRAME_PREPENDER, PipelineUtils.PACKET_ENCODER, new MinecraftEncoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
@@ -368,7 +390,7 @@ index 7c52ee9a..a2b7c080 100644
              }
          };
          ChannelFutureListener listener = new ChannelFutureListener()
-@@ -372,7 +390,7 @@ public final class UserConnection implements ProxiedPlayer
+@@ -372,7 +391,7 @@ public final class UserConnection implements ProxiedPlayer
                      {
                          if (request.isSendFeedback()) sendMessage( bungee.getTranslation( "fallback_lobby" ) ); // Waterfall
                          connect( def, null, true, ServerConnectEvent.Reason.LOBBY_FALLBACK, request.getConnectTimeout(), request.isSendFeedback() ); // Waterfall
@@ -377,7 +399,7 @@ index 7c52ee9a..a2b7c080 100644
                      {
                          disconnect( bungee.getTranslation( "fallback_kick", connectionFailMessage( future.cause() ) ) );
                      } else
-@@ -769,4 +787,13 @@ public final class UserConnection implements ProxiedPlayer
+@@ -769,4 +788,13 @@ public final class UserConnection implements ProxiedPlayer
          return entityRewrite == net.md_5.bungee.entitymap.EntityMap_Dummy.INSTANCE;
      }
      // Waterfall end
@@ -405,14 +427,14 @@ index bea2bbff..6fca66a8 100644
      /**
       * The users' mod list.
 diff --git a/proxy/src/main/java/net/md_5/bungee/forge/ForgeConstants.java b/proxy/src/main/java/net/md_5/bungee/forge/ForgeConstants.java
-index f5253b89..e8cfade0 100644
+index f5253b89..8161c06b 100644
 --- a/proxy/src/main/java/net/md_5/bungee/forge/ForgeConstants.java
 +++ b/proxy/src/main/java/net/md_5/bungee/forge/ForgeConstants.java
 @@ -22,6 +22,8 @@ public class ForgeConstants
       * The FML 1.8 handshake token.
       */
      public static final String FML_HANDSHAKE_TOKEN = "\0FML\0";
-+    public static final String MODERN_FML_HANDSHAKE_TOKEN = "\0FML2\0";
++    public static final String MODERN_FML_HANDSHAKE_TOKEN = "\0FML2\0", MODERN_FML_NET_3 = "\0FML3\0"; // lightfall
 +    public static final PluginMessage MODERN_FML_RESET = new PluginMessage("lightfall:reset", new byte[]{0,0}, true);
  
      public static final PluginMessage FML_RESET_HANDSHAKE = new PluginMessage( FML_HANDSHAKE_TAG, new byte[]
