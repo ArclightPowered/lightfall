@@ -1,4 +1,4 @@
-From 537953e540842598904bfd2407afc945fbe8f15b Mon Sep 17 00:00:00 2001
+From 6f6068ad19cd9d08dea3eb1c7eaaf1cdccf92b2d Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 19:26:00 +0800
 Subject: [PATCH] Change brand to lightfall
@@ -584,6 +584,19 @@ index 338c30d3..13cf6fec 100644
                  module.getName()
              );
              URL website = new URL( url );
+diff --git a/proxy/src/main/java/net/md_5/bungee/module/ModuleManager.java b/proxy/src/main/java/net/md_5/bungee/module/ModuleManager.java
+index d3abee44..fd8ba223 100644
+--- a/proxy/src/main/java/net/md_5/bungee/module/ModuleManager.java
++++ b/proxy/src/main/java/net/md_5/bungee/module/ModuleManager.java
+@@ -124,7 +124,7 @@ public class ModuleManager
+         {
+             ModuleVersion moduleVersion = ( module.getFile().exists() ) ? getVersion( module.getFile() ) : null;
+ 
+-            if ( !bungeeVersion.equals( moduleVersion ) )
++            if ( false && !bungeeVersion.equals( moduleVersion ) ) // lightfall
+             {
+                 System.out.println( "Attempting to update plugin from " + moduleVersion + " to " + bungeeVersion );
+                 module.getProvider().retrieve( module, bungeeVersion );
 diff --git a/query/pom.xml b/query/pom.xml
 index 081bff62..1f078635 100644
 --- a/query/pom.xml
