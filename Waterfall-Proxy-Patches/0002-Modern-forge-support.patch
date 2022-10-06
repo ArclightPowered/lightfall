@@ -1,4 +1,4 @@
-From 264a06c1824fdce348789ff3b4b0bcae1e01fb43 Mon Sep 17 00:00:00 2001
+From 4495bcc5c54b1f5b14fd6d3ce8f7810b04419449 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 22:24:56 +0800
 Subject: [PATCH] Modern forge support
@@ -44,42 +44,6 @@ index d4b03843..5d0ca482 100644
      @Setter
      private Protocol protocol;
      private boolean server;
-diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
-index 633e557c..10490a65 100644
---- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
-+++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
-@@ -512,6 +512,19 @@ public class Commands extends DefinedPacket
-                 DefinedPacket.writeString( t, buf );
-             }
-         };
-+        // lightfall start
-+        private static final ArgumentSerializer<String> FORGE_ENUM = new ArgumentSerializer<String>() {
-+            @Override
-+            protected String read(ByteBuf buf) {
-+                return readString(buf);
-+            }
-+
-+            @Override
-+            protected void write(ByteBuf buf, String enumClass) {
-+                writeString(enumClass, buf);
-+            }
-+        };
-+        // lightfall end
- 
-         static
-         {
-@@ -567,6 +580,11 @@ public class Commands extends DefinedPacket
-             PROVIDERS.put( "minecraft:angle", VOID ); // 1.16.2
-             PROVIDERS.put( "minecraft:resource", RAW_STRING ); // 1.18.2
-             PROVIDERS.put( "minecraft:resource_or_tag", RAW_STRING ); // 1.18.2
-+            // lightfall start
-+            PROVIDERS.put( "forge:enum", FORGE_ENUM );
-+            PROVIDERS.put( "forge:modid", VOID );
-+            PROVIDERS.put( "minecraft:", VOID );
-+            // lightfall end
-         }
- 
-         private static ArgumentType<?> read(String key, ByteBuf buf)
 diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/PluginMessage.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/PluginMessage.java
 index 91f71c09..be62a708 100644
 --- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/PluginMessage.java
@@ -319,7 +283,7 @@ index 00000000..5e5432ec
 +    }
 +}
 diff --git a/proxy/src/main/java/net/md_5/bungee/ServerConnector.java b/proxy/src/main/java/net/md_5/bungee/ServerConnector.java
-index 9e74d158..053e7885 100644
+index 8181d76b..664788ef 100644
 --- a/proxy/src/main/java/net/md_5/bungee/ServerConnector.java
 +++ b/proxy/src/main/java/net/md_5/bungee/ServerConnector.java
 @@ -64,10 +64,10 @@ import net.md_5.bungee.util.QuietException;
@@ -338,7 +302,7 @@ index 9e74d158..053e7885 100644
      @Getter
      private ForgeServerHandler handshakeHandler;
 diff --git a/proxy/src/main/java/net/md_5/bungee/UserConnection.java b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
-index 7c52ee9a..be6065bd 100644
+index b44d13e5..718d438b 100644
 --- a/proxy/src/main/java/net/md_5/bungee/UserConnection.java
 +++ b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
 @@ -46,6 +46,8 @@ import net.md_5.bungee.entitymap.EntityMap;
@@ -350,7 +314,7 @@ index 7c52ee9a..be6065bd 100644
  import net.md_5.bungee.netty.ChannelWrapper;
  import net.md_5.bungee.netty.HandlerBoss;
  import net.md_5.bungee.netty.PipelineUtils;
-@@ -168,6 +170,16 @@ public final class UserConnection implements ProxiedPlayer
+@@ -169,6 +171,16 @@ public final class UserConnection implements ProxiedPlayer
              addGroups( s );
          }
  
@@ -367,7 +331,7 @@ index 7c52ee9a..be6065bd 100644
          forgeClientHandler = new ForgeClientHandler( this );
  
          // No-config FML handshake marker.
-@@ -176,6 +188,7 @@ public final class UserConnection implements ProxiedPlayer
+@@ -177,6 +189,7 @@ public final class UserConnection implements ProxiedPlayer
          {
              forgeClientHandler.setFmlTokenInHandshake( true );
          }
@@ -375,7 +339,7 @@ index 7c52ee9a..be6065bd 100644
      }
  
      public void sendPacket(PacketWrapper packet)
-@@ -348,7 +361,13 @@ public final class UserConnection implements ProxiedPlayer
+@@ -349,7 +362,13 @@ public final class UserConnection implements ProxiedPlayer
                  PipelineUtils.BASE.initChannel( ch );
                  ch.pipeline().addAfter( PipelineUtils.FRAME_DECODER, PipelineUtils.PACKET_DECODER, new MinecraftDecoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
                  ch.pipeline().addAfter( PipelineUtils.FRAME_PREPENDER, PipelineUtils.PACKET_ENCODER, new MinecraftEncoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
@@ -390,7 +354,7 @@ index 7c52ee9a..be6065bd 100644
              }
          };
          ChannelFutureListener listener = new ChannelFutureListener()
-@@ -372,7 +391,7 @@ public final class UserConnection implements ProxiedPlayer
+@@ -373,7 +392,7 @@ public final class UserConnection implements ProxiedPlayer
                      {
                          if (request.isSendFeedback()) sendMessage( bungee.getTranslation( "fallback_lobby" ) ); // Waterfall
                          connect( def, null, true, ServerConnectEvent.Reason.LOBBY_FALLBACK, request.getConnectTimeout(), request.isSendFeedback() ); // Waterfall
@@ -399,7 +363,7 @@ index 7c52ee9a..be6065bd 100644
                      {
                          disconnect( bungee.getTranslation( "fallback_kick", connectionFailMessage( future.cause() ) ) );
                      } else
-@@ -769,4 +788,13 @@ public final class UserConnection implements ProxiedPlayer
+@@ -786,4 +805,13 @@ public final class UserConnection implements ProxiedPlayer
          return entityRewrite == net.md_5.bungee.entitymap.EntityMap_Dummy.INSTANCE;
      }
      // Waterfall end
