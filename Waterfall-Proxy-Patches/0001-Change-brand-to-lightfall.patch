@@ -1,4 +1,4 @@
-From 5c789d7281c5102465ca455daf7128d7a93fe22c Mon Sep 17 00:00:00 2001
+From dc58a8211cbf8668092df69c71212fbb9e903989 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 19:26:00 +0800
 Subject: [PATCH] Change brand to lightfall
@@ -572,7 +572,7 @@ index 0dd69778..2c3381f7 100644
              SocketAddress address = Util.getAddr( addr );
              ServerInfo info = ProxyServer.getInstance().constructServerInfo( name, address, motd, restricted );
 diff --git a/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java b/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java
-index 5bb86152..77ed53b1 100644
+index 5bb86152..eb0a9a7c 100644
 --- a/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java
 +++ b/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java
 @@ -22,7 +22,7 @@ public class JenkinsModuleSource implements ModuleSource
@@ -580,7 +580,7 @@ index 5bb86152..77ed53b1 100644
                  "waterfall",
                  net.md_5.bungee.api.ProxyServer.getInstance().getVersion().split(":")[2].split("-")[0],
 -                version.getBuild(),
-+                488,
++                504,
                  module.getName()
              );
              URL website = new URL( url );
