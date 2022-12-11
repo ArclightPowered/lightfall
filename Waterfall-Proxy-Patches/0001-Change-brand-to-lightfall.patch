@@ -1,11 +1,11 @@
-From dc58a8211cbf8668092df69c71212fbb9e903989 Mon Sep 17 00:00:00 2001
+From ed2639b3c506bd466ce6ac98223fb403b2d0c8b4 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 19:26:00 +0800
 Subject: [PATCH] Change brand to lightfall
 
 
 diff --git a/api/pom.xml b/api/pom.xml
-index 405b1c2c..9a1587de 100644
+index 5d21fd99..1f27ec51 100644
 --- a/api/pom.xml
 +++ b/api/pom.xml
 @@ -4,42 +4,47 @@
@@ -142,7 +142,7 @@ index a4516ed9..1bb5dbce 100644
              return;
          }
 diff --git a/chat/pom.xml b/chat/pom.xml
-index 1a8b097d..c7ac680c 100644
+index 003b3f6c..5d19b566 100644
 --- a/chat/pom.xml
 +++ b/chat/pom.xml
 @@ -4,18 +4,17 @@
@@ -169,7 +169,7 @@ index 1a8b097d..c7ac680c 100644
  
      <dependencies>
 diff --git a/config/pom.xml b/config/pom.xml
-index 0b48084a..d6eba1b3 100644
+index 91da386a..e7159f39 100644
 --- a/config/pom.xml
 +++ b/config/pom.xml
 @@ -4,18 +4,17 @@
@@ -348,7 +348,7 @@ index caa4c4cb..8cbd8ce9 100644
  
      <dependencies>
 diff --git a/pom.xml b/pom.xml
-index 6810b9cc..bf3c2e4a 100644
+index 2bf979de..0ceea0ab 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -4,24 +4,23 @@
@@ -521,10 +521,10 @@ index 1036a2e7..66876c22 100644
              <scope>compile</scope>
          </dependency>
 diff --git a/proxy/src/main/java/net/md_5/bungee/BungeeCord.java b/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
-index 9ef2b77a..e524136c 100644
+index e0fcd8fb..e5c97051 100644
 --- a/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
 +++ b/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
-@@ -536,7 +536,7 @@ public class BungeeCord extends ProxyServer
+@@ -545,7 +545,7 @@ public class BungeeCord extends ProxyServer
      @Override
      public String getName()
      {
@@ -534,7 +534,7 @@ index 9ef2b77a..e524136c 100644
  
      @Override
 diff --git a/proxy/src/main/java/net/md_5/bungee/BungeeCordLauncher.java b/proxy/src/main/java/net/md_5/bungee/BungeeCordLauncher.java
-index 0db3d76a..68394d25 100644
+index 96a9998d..9c36927b 100644
 --- a/proxy/src/main/java/net/md_5/bungee/BungeeCordLauncher.java
 +++ b/proxy/src/main/java/net/md_5/bungee/BungeeCordLauncher.java
 @@ -63,7 +63,7 @@ public class BungeeCordLauncher

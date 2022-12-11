@@ -1,4 +1,4 @@
-From 09745f4eab8121135a2f7ee17ccdd5ec8c4d83af Mon Sep 17 00:00:00 2001
+From d02c4fbb6ad7b8b4412875673dfe42a2adf4418a Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Wed, 5 May 2021 23:50:01 +0800
 Subject: [PATCH] Wrap modded command arguments
@@ -32,7 +32,7 @@ index 00000000..73d491fa
 +    }
 +}
 diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
-index 0eb3661b..482cc107 100644
+index 80a16f65..5e016bf4 100644
 --- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
 +++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
 @@ -21,6 +21,7 @@ import com.mojang.brigadier.tree.ArgumentCommandNode;
@@ -42,8 +42,8 @@ index 0eb3661b..482cc107 100644
 +import io.izzel.lightfall.forge.WrappedArgumentType;
  import io.netty.buffer.ByteBuf;
  import java.util.ArrayDeque;
- import java.util.ArrayList;
-@@ -520,6 +521,64 @@ public class Commands extends DefinedPacket
+ import java.util.Collection;
+@@ -519,6 +520,64 @@ public class Commands extends DefinedPacket
                  DefinedPacket.writeString( t, buf );
              }
          };
@@ -108,10 +108,10 @@ index 0eb3661b..482cc107 100644
  
          static
          {
-@@ -576,6 +635,13 @@ public class Commands extends DefinedPacket
-             register( "minecraft:uuid", VOID ); // 1.16
- 
-             register( "minecraft:nbt", VOID ); // 1.13 // removed
+@@ -682,6 +741,13 @@ public class Commands extends DefinedPacket
+                 get( "minecraft:template_rotation" ),
+                 get( "minecraft:uuid" )
+             };
 +            // lightfall start
 +            PROVIDERS.put( "forge:enum", FORGE_ENUM );
 +            PROVIDERS.put( "forge:modid", VOID );
@@ -122,16 +122,20 @@ index 0eb3661b..482cc107 100644
          }
  
          private static void register(String name, ArgumentSerializer serializer)
-@@ -592,7 +658,7 @@ public class Commands extends DefinedPacket
+@@ -702,7 +768,11 @@ public class Commands extends DefinedPacket
              if ( protocolVersion >= ProtocolConstants.MINECRAFT_1_19 )
              {
                  key = readVarInt( buf );
--                reader = PROVIDER_LIST.get( (Integer) key );
-+                reader = key.equals(ARCLIGHT_WRAP_INDEX) ? ARCLIGHT_WRAP : PROVIDER_LIST.get( (Integer) key ); // lightfall - wrapped argument
-             } else
-             {
-                 key = readString( buf );
-@@ -601,7 +667,7 @@ public class Commands extends DefinedPacket
+-
++                // lightfall - start
++                if (key.equals(ARCLIGHT_WRAP_INDEX)) {
++                    reader = ARCLIGHT_WRAP;
++                } else
++                // lightfall - end
+                 if ( protocolVersion >= ProtocolConstants.MINECRAFT_1_19_3 )
+                 {
+                     reader = IDS_1_19_3[(Integer) key];
+@@ -718,7 +788,7 @@ public class Commands extends DefinedPacket
  
              Preconditions.checkArgument( reader != null, "No provider for argument " + key );
  
@@ -140,7 +144,7 @@ index 0eb3661b..482cc107 100644
              return val != null && PROPER_PROVIDERS.containsKey( val.getClass() ) ? (ArgumentType<?>) val : new DummyType( key, reader, val );
          }
  
-@@ -612,10 +678,10 @@ public class Commands extends DefinedPacket
+@@ -729,10 +799,10 @@ public class Commands extends DefinedPacket
              {
                  if ( protocolVersion >= ProtocolConstants.MINECRAFT_1_19 )
                  {
@@ -153,7 +157,7 @@ index 0eb3661b..482cc107 100644
                  }
                  proper.write( buf, arg );
              } else
-@@ -654,6 +720,12 @@ public class Commands extends DefinedPacket
+@@ -771,6 +841,12 @@ public class Commands extends DefinedPacket
  
              protected abstract T read(ByteBuf buf);
  
@@ -166,7 +170,7 @@ index 0eb3661b..482cc107 100644
              protected abstract void write(ByteBuf buf, T t);
          }
  
-@@ -663,6 +735,16 @@ public class Commands extends DefinedPacket
+@@ -780,6 +856,16 @@ public class Commands extends DefinedPacket
              protected abstract int getIntKey();
  
              protected abstract String getKey();
@@ -184,10 +188,10 @@ index 0eb3661b..482cc107 100644
      }
  
 diff --git a/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java b/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java
-index 59d204ce..7934beb9 100644
+index 89b98b36..4055dad9 100644
 --- a/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java
 +++ b/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java
-@@ -91,6 +91,7 @@ public class DownstreamBridge extends PacketHandler
+@@ -93,6 +93,7 @@ public class DownstreamBridge extends PacketHandler
              // do not perform any actions if the user has already moved
              return;
          }
