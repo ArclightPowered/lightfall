@@ -1,4 +1,4 @@
-From 4495bcc5c54b1f5b14fd6d3ce8f7810b04419449 Mon Sep 17 00:00:00 2001
+From 9dca8d55c6430e482da8b1610f6b4672856a5ede Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 22:24:56 +0800
 Subject: [PATCH] Modern forge support
@@ -302,7 +302,7 @@ index 8181d76b..664788ef 100644
      @Getter
      private ForgeServerHandler handshakeHandler;
 diff --git a/proxy/src/main/java/net/md_5/bungee/UserConnection.java b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
-index b44d13e5..718d438b 100644
+index cf82c182..4dc91186 100644
 --- a/proxy/src/main/java/net/md_5/bungee/UserConnection.java
 +++ b/proxy/src/main/java/net/md_5/bungee/UserConnection.java
 @@ -46,6 +46,8 @@ import net.md_5.bungee.entitymap.EntityMap;
@@ -340,7 +340,7 @@ index b44d13e5..718d438b 100644
  
      public void sendPacket(PacketWrapper packet)
 @@ -349,7 +362,13 @@ public final class UserConnection implements ProxiedPlayer
-                 PipelineUtils.BASE.initChannel( ch );
+                 PipelineUtils.BASE_SERVERSIDE.initChannel( ch );
                  ch.pipeline().addAfter( PipelineUtils.FRAME_DECODER, PipelineUtils.PACKET_DECODER, new MinecraftDecoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
                  ch.pipeline().addAfter( PipelineUtils.FRAME_PREPENDER, PipelineUtils.PACKET_ENCODER, new MinecraftEncoder( Protocol.HANDSHAKE, false, getPendingConnection().getVersion() ) );
 -                ch.pipeline().get( HandlerBoss.class ).setHandler( new ServerConnector( bungee, UserConnection.this, target ) );

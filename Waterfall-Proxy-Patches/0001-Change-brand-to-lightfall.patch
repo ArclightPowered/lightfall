@@ -1,11 +1,11 @@
-From ed2639b3c506bd466ce6ac98223fb403b2d0c8b4 Mon Sep 17 00:00:00 2001
+From 79ca0f06c5f99636b9c13348c79791fd469eec86 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 19:26:00 +0800
 Subject: [PATCH] Change brand to lightfall
 
 
 diff --git a/api/pom.xml b/api/pom.xml
-index 5d21fd99..1f27ec51 100644
+index 92bd6c03..1d248bc7 100644
 --- a/api/pom.xml
 +++ b/api/pom.xml
 @@ -4,42 +4,47 @@
@@ -68,7 +68,7 @@ index 5d21fd99..1f27ec51 100644
              <version>${project.version}</version>
              <scope>compile</scope>
          </dependency>
-@@ -82,5 +87,11 @@
+@@ -81,5 +86,11 @@
              <artifactId>slf4j-api</artifactId>
              <version>1.7.25</version>
          </dependency>
@@ -81,7 +81,7 @@ index 5d21fd99..1f27ec51 100644
      </dependencies>
  </project>
 diff --git a/bootstrap/pom.xml b/bootstrap/pom.xml
-index 688f1b99..60c6c15a 100644
+index f9ec2c1c..69e5225e 100644
 --- a/bootstrap/pom.xml
 +++ b/bootstrap/pom.xml
 @@ -4,19 +4,18 @@
@@ -321,7 +321,7 @@ index 0de7979e..9a7c3c63 100644
              <version>${project.version}</version>
              <scope>compile</scope>
 diff --git a/native/pom.xml b/native/pom.xml
-index caa4c4cb..8cbd8ce9 100644
+index e137dfcc..bbe8548b 100644
 --- a/native/pom.xml
 +++ b/native/pom.xml
 @@ -4,18 +4,17 @@
@@ -348,7 +348,7 @@ index caa4c4cb..8cbd8ce9 100644
  
      <dependencies>
 diff --git a/pom.xml b/pom.xml
-index 2bf979de..0ceea0ab 100644
+index c7a036c3..408116cc 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -4,24 +4,23 @@
@@ -414,7 +414,7 @@ index 2bf979de..0ceea0ab 100644
  
      <distributionManagement>
 diff --git a/protocol/pom.xml b/protocol/pom.xml
-index 93ae5952..1df879c7 100644
+index 221469b9..3bf4f136 100644
 --- a/protocol/pom.xml
 +++ b/protocol/pom.xml
 @@ -4,18 +4,17 @@
@@ -452,7 +452,7 @@ index 93ae5952..1df879c7 100644
              <scope>compile</scope>
          </dependency>
 diff --git a/proxy/pom.xml b/proxy/pom.xml
-index 1036a2e7..66876c22 100644
+index 61172190..175ab820 100644
 --- a/proxy/pom.xml
 +++ b/proxy/pom.xml
 @@ -4,18 +4,17 @@
@@ -478,7 +478,7 @@ index 1036a2e7..66876c22 100644
      <description>Proxy component of the Elastic Portal Suite</description>
  
      <properties>
-@@ -71,32 +70,32 @@
+@@ -64,32 +63,32 @@
              <scope>compile</scope>
          </dependency>
          <dependency>
@@ -521,7 +521,7 @@ index 1036a2e7..66876c22 100644
              <scope>compile</scope>
          </dependency>
 diff --git a/proxy/src/main/java/net/md_5/bungee/BungeeCord.java b/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
-index e0fcd8fb..e5c97051 100644
+index d88c296a..2fefda94 100644
 --- a/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
 +++ b/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
 @@ -545,7 +545,7 @@ public class BungeeCord extends ProxyServer
@@ -598,7 +598,7 @@ index d3abee44..f7aaf001 100644
                  System.out.println( "Attempting to update plugin from " + moduleVersion + " to " + bungeeVersion );
                  module.getProvider().retrieve( module, bungeeVersion );
 diff --git a/query/pom.xml b/query/pom.xml
-index 72eb14e2..66d33969 100644
+index 81af5457..9e19d1c0 100644
 --- a/query/pom.xml
 +++ b/query/pom.xml
 @@ -4,18 +4,17 @@
@@ -624,7 +624,7 @@ index 72eb14e2..66d33969 100644
      <description>Minecraft query implementation based on the Waterfall API.</description>
  
      <dependencies>
-@@ -26,7 +25,7 @@
+@@ -25,7 +24,7 @@
              <scope>compile</scope>
          </dependency>
          <dependency>

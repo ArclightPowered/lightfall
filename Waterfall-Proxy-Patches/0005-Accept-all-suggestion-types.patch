@@ -1,14 +1,14 @@
-From f291f545565c57ab22b6680d8538c22613a01572 Mon Sep 17 00:00:00 2001
+From fa0ecc31dbcfa1dfcd40ae25c3708c70c47da901 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Thu, 6 May 2021 21:04:52 +0800
 Subject: [PATCH] Accept all suggestion types
 
 
 diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
-index 5e016bf4..8fc88c11 100644
+index 9f6918fb..956f42fe 100644
 --- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
 +++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
-@@ -892,7 +892,7 @@ public class Commands extends DefinedPacket
+@@ -957,7 +957,7 @@ public class Commands extends DefinedPacket
  
          private static SuggestionProvider<DummyProvider> getProvider(String key)
          {
