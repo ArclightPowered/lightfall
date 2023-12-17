@@ -1,14 +1,14 @@
-From bb523d029de3e151fbd5293569b0325143c396b1 Mon Sep 17 00:00:00 2001
+From 1b21148f2b1e7006b2c1885e2955fd5e643d6191 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Fri, 9 Jul 2021 15:58:58 +0800
 Subject: [PATCH] Implement ModernFMLHandshakeEvent
 
 
 diff --git a/api/pom.xml b/api/pom.xml
-index 1d248bc7..e9ef74f9 100644
+index 23d08d27..a7fe5292 100644
 --- a/api/pom.xml
 +++ b/api/pom.xml
-@@ -90,7 +90,7 @@
+@@ -84,7 +84,7 @@
          <dependency>
              <groupId>io.izzel.lightfall</groupId>
              <artifactId>lightfall-api</artifactId>

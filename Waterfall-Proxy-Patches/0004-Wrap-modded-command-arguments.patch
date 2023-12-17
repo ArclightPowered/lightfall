@@ -1,4 +1,4 @@
-From dc01198449836cb50ffb65bc627eba836d9fb8da Mon Sep 17 00:00:00 2001
+From 1bf437aba8c0d7118a9ee42dad0c1bc5f5ca774b Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Wed, 5 May 2021 23:50:01 +0800
 Subject: [PATCH] Wrap modded command arguments
@@ -32,7 +32,7 @@ index 00000000..73d491fa
 +    }
 +}
 diff --git a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
-index 05761bf5..9f6918fb 100644
+index 069bb52b..64cc579b 100644
 --- a/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
 +++ b/protocol/src/main/java/net/md_5/bungee/protocol/packet/Commands.java
 @@ -21,6 +21,7 @@ import com.mojang.brigadier.tree.ArgumentCommandNode;
@@ -43,7 +43,7 @@ index 05761bf5..9f6918fb 100644
  import io.netty.buffer.ByteBuf;
  import java.util.ArrayDeque;
  import java.util.Collection;
-@@ -534,6 +535,64 @@ public class Commands extends DefinedPacket
+@@ -535,6 +536,64 @@ public class Commands extends DefinedPacket
                  DefinedPacket.writeString( t, buf );
              }
          };
@@ -108,7 +108,7 @@ index 05761bf5..9f6918fb 100644
  
          static
          {
-@@ -744,6 +803,13 @@ public class Commands extends DefinedPacket
+@@ -799,6 +858,13 @@ public class Commands extends DefinedPacket
                  get( "minecraft:uuid", VOID ),
                  get( "minecraft:heightmap", VOID )
              };
@@ -122,7 +122,7 @@ index 05761bf5..9f6918fb 100644
          }
  
          private static void register(String name, ArgumentSerializer serializer)
-@@ -764,7 +830,11 @@ public class Commands extends DefinedPacket
+@@ -819,7 +885,11 @@ public class Commands extends DefinedPacket
              if ( protocolVersion >= ProtocolConstants.MINECRAFT_1_19 )
              {
                  key = readVarInt( buf );
@@ -132,10 +132,10 @@ index 05761bf5..9f6918fb 100644
 +                    reader = ARCLIGHT_WRAP;
 +                } else
 +                // lightfall - end
-                 if ( protocolVersion >= ProtocolConstants.MINECRAFT_1_19_4 )
+                 if ( protocolVersion >= ProtocolConstants.MINECRAFT_1_20_3 )
                  {
-                     reader = IDS_1_19_4[(Integer) key];
-@@ -783,7 +853,7 @@ public class Commands extends DefinedPacket
+                     reader = IDS_1_20_3[(Integer) key];
+@@ -841,7 +911,7 @@ public class Commands extends DefinedPacket
  
              Preconditions.checkArgument( reader != null, "No provider for argument " + key );
  
@@ -144,7 +144,7 @@ index 05761bf5..9f6918fb 100644
              return val != null && PROPER_PROVIDERS.containsKey( val.getClass() ) ? (ArgumentType<?>) val : new DummyType( key, reader, val );
          }
  
-@@ -794,10 +864,10 @@ public class Commands extends DefinedPacket
+@@ -852,10 +922,10 @@ public class Commands extends DefinedPacket
              {
                  if ( protocolVersion >= ProtocolConstants.MINECRAFT_1_19 )
                  {
@@ -157,7 +157,7 @@ index 05761bf5..9f6918fb 100644
                  }
                  proper.write( buf, arg );
              } else
-@@ -836,6 +906,12 @@ public class Commands extends DefinedPacket
+@@ -894,6 +964,12 @@ public class Commands extends DefinedPacket
  
              protected abstract T read(ByteBuf buf);
  
@@ -170,7 +170,7 @@ index 05761bf5..9f6918fb 100644
              protected abstract void write(ByteBuf buf, T t);
          }
  
-@@ -845,6 +921,16 @@ public class Commands extends DefinedPacket
+@@ -903,6 +979,16 @@ public class Commands extends DefinedPacket
              protected abstract int getIntKey();
  
              protected abstract String getKey();
@@ -188,10 +188,10 @@ index 05761bf5..9f6918fb 100644
      }
  
 diff --git a/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java b/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java
-index e01f65ac..11639f9c 100644
+index d0496ab4..c73e85a4 100644
 --- a/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java
 +++ b/proxy/src/main/java/net/md_5/bungee/connection/DownstreamBridge.java
-@@ -93,6 +93,7 @@ public class DownstreamBridge extends PacketHandler
+@@ -97,6 +97,7 @@ public class DownstreamBridge extends PacketHandler
              // do not perform any actions if the user has already moved
              return;
          }

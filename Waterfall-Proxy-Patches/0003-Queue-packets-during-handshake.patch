@@ -1,4 +1,4 @@
-From 1ed65897d4cb2efe2332e0b22223665cd4fafe88 Mon Sep 17 00:00:00 2001
+From 95adbd39ea62388a8e168dcadb05a25f02c48be2 Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 14 Mar 2021 20:04:23 +0800
 Subject: [PATCH] Queue packets during handshake
@@ -25,7 +25,7 @@ index 1713e7d5..0f5c1fa6 100644
                  if (user.getServer() != null) {
                      user.getServer().setObsolete(true);
 diff --git a/proxy/src/main/java/net/md_5/bungee/netty/ChannelWrapper.java b/proxy/src/main/java/net/md_5/bungee/netty/ChannelWrapper.java
-index 6dc5633f..e9f03515 100644
+index 00e03bae..894cbdbd 100644
 --- a/proxy/src/main/java/net/md_5/bungee/netty/ChannelWrapper.java
 +++ b/proxy/src/main/java/net/md_5/bungee/netty/ChannelWrapper.java
 @@ -6,6 +6,9 @@ import io.netty.channel.ChannelFutureListener;
@@ -38,7 +38,7 @@ index 6dc5633f..e9f03515 100644
  import java.util.concurrent.TimeUnit;
  import lombok.Getter;
  import lombok.Setter;
-@@ -16,6 +19,8 @@ import net.md_5.bungee.protocol.MinecraftEncoder;
+@@ -17,6 +20,8 @@ import net.md_5.bungee.protocol.MinecraftEncoder;
  import net.md_5.bungee.protocol.PacketWrapper;
  import net.md_5.bungee.protocol.Protocol;
  import net.md_5.bungee.protocol.packet.Kick;
@@ -47,7 +47,7 @@ index 6dc5633f..e9f03515 100644
  
  public class ChannelWrapper
  {
-@@ -51,6 +56,17 @@ public class ChannelWrapper
+@@ -78,6 +83,17 @@ public class ChannelWrapper
      {
          if ( !closed )
          {
@@ -62,10 +62,10 @@ index 6dc5633f..e9f03515 100644
 +                return;
 +            }
 +            // lightfall end
+             DefinedPacket defined = null;
              if ( packet instanceof PacketWrapper )
              {
-                 ( (PacketWrapper) packet ).setReleased( true );
-@@ -145,4 +161,19 @@ public class ChannelWrapper
+@@ -188,4 +204,19 @@ public class ChannelWrapper
              ch.pipeline().remove( "decompress" );
          }
      }
@@ -86,5 +86,5 @@ index 6dc5633f..e9f03515 100644
 +    // lightfall end
  }
 -- 
-2.17.1
+2.36.1.windows.1
 

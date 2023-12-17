@@ -1,11 +1,11 @@
-From c5d11f76fafcadf38c140ed814a693b466c8581b Mon Sep 17 00:00:00 2001
+From 5b4d23ec2279ae713fc3b65898ec4fa6e4f9125f Mon Sep 17 00:00:00 2001
 From: IzzelAliz <csh2001331@126.com>
 Date: Sun, 7 Mar 2021 19:26:00 +0800
 Subject: [PATCH] Change brand to lightfall
 
 
 diff --git a/api/pom.xml b/api/pom.xml
-index 01b8f888..4260e2b5 100644
+index 3cd57d98..23d08d27 100644
 --- a/api/pom.xml
 +++ b/api/pom.xml
 @@ -4,42 +4,47 @@
@@ -14,15 +14,16 @@ index 01b8f888..4260e2b5 100644
      <parent>
 -        <groupId>io.github.waterfallmc</groupId>
 -        <artifactId>waterfall-parent</artifactId>
+-    <version>1.20-R0.2-SNAPSHOT</version>
 +        <groupId>io.izzel.lightfall</groupId>
 +        <artifactId>lightfall-parent</artifactId>
-         <version>1.20-R0.1-SNAPSHOT</version>
++        <version>1.20-R0.2-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
      </parent>
  
 -    <groupId>io.github.waterfallmc</groupId>
      <artifactId>waterfall-api</artifactId>
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>jar</packaging>
  
 -    <name>Waterfall-API</name>
@@ -68,9 +69,9 @@ index 01b8f888..4260e2b5 100644
              <version>${project.version}</version>
              <scope>compile</scope>
          </dependency>
-@@ -81,5 +86,11 @@
-             <artifactId>slf4j-api</artifactId>
-             <version>1.7.36</version>
+@@ -75,5 +80,11 @@
+             <version>2.2</version>
+             <scope>compile</scope>
          </dependency>
 +        <!-- lightfall - Add API -->
 +        <dependency>
@@ -81,7 +82,7 @@ index 01b8f888..4260e2b5 100644
      </dependencies>
  </project>
 diff --git a/bootstrap/pom.xml b/bootstrap/pom.xml
-index 8328e576..2a1ee7de 100644
+index 7fbac761..5ecb4452 100644
 --- a/bootstrap/pom.xml
 +++ b/bootstrap/pom.xml
 @@ -4,19 +4,18 @@
@@ -92,14 +93,14 @@ index 8328e576..2a1ee7de 100644
 -        <artifactId>waterfall-parent</artifactId>
 +        <groupId>io.izzel.lightfall</groupId>
 +        <artifactId>lightfall-parent</artifactId>
-         <version>1.20-R0.1-SNAPSHOT</version>
+         <version>1.20-R0.2-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
      </parent>
  
 -    <groupId>io.github.waterfallmc</groupId>
 -    <artifactId>waterfall-bootstrap</artifactId>
 +    <artifactId>lightfall-bootstrap</artifactId>
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>jar</packaging>
  
 -    <name>Waterfall-Bootstrap</name>
@@ -142,7 +143,7 @@ index a4516ed9..1bb5dbce 100644
              return;
          }
 diff --git a/chat/pom.xml b/chat/pom.xml
-index 040aa0f7..424259c9 100644
+index 2aa2ad55..2ac8e2a6 100644
 --- a/chat/pom.xml
 +++ b/chat/pom.xml
 @@ -4,18 +4,17 @@
@@ -153,14 +154,14 @@ index 040aa0f7..424259c9 100644
 -        <artifactId>waterfall-parent</artifactId>
 +        <groupId>io.izzel.lightfall</groupId>
 +        <artifactId>lightfall-parent</artifactId>
-         <version>1.20-R0.1-SNAPSHOT</version>
+         <version>1.20-R0.2-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
      </parent>
  
 -    <groupId>io.github.waterfallmc</groupId>
 -    <artifactId>waterfall-chat</artifactId>
 +    <artifactId>lightfall-chat</artifactId>
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>jar</packaging>
  
 -    <name>Waterfall-Chat</name>
@@ -169,7 +170,7 @@ index 040aa0f7..424259c9 100644
  
      <dependencies>
 diff --git a/config/pom.xml b/config/pom.xml
-index 7e2d07a7..616f9bca 100644
+index 058e6fa8..7865bcf5 100644
 --- a/config/pom.xml
 +++ b/config/pom.xml
 @@ -4,18 +4,17 @@
@@ -180,14 +181,14 @@ index 7e2d07a7..616f9bca 100644
 -        <artifactId>waterfall-parent</artifactId>
 +        <groupId>io.izzel.lightfall</groupId>
 +        <artifactId>lightfall-parent</artifactId>
-         <version>1.20-R0.1-SNAPSHOT</version>
+         <version>1.20-R0.2-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
      </parent>
  
 -    <groupId>io.github.waterfallmc</groupId>
 -    <artifactId>waterfall-config</artifactId>
 +    <artifactId>lightfall-config</artifactId>
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>jar</packaging>
  
 -    <name>Waterfall-Config</name>
@@ -196,7 +197,7 @@ index 7e2d07a7..616f9bca 100644
  
      <dependencies>
 diff --git a/event/pom.xml b/event/pom.xml
-index b2541c62..bb7a8689 100644
+index 316f1e35..a38b6d54 100644
 --- a/event/pom.xml
 +++ b/event/pom.xml
 @@ -4,17 +4,16 @@
@@ -207,14 +208,14 @@ index b2541c62..bb7a8689 100644
 -        <artifactId>waterfall-parent</artifactId>
 +        <groupId>io.izzel.lightfall</groupId>
 +        <artifactId>lightfall-parent</artifactId>
-         <version>1.20-R0.1-SNAPSHOT</version>
+         <version>1.20-R0.2-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
      </parent>
  
 -    <groupId>io.github.waterfallmc</groupId>
 -    <artifactId>waterfall-event</artifactId>
 +    <artifactId>lightfall-event</artifactId>
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>jar</packaging>
  
 -    <name>Waterfall-Event</name>
@@ -223,7 +224,7 @@ index b2541c62..bb7a8689 100644
 +    <description>Generic java event dispatching API intended for use with lightfall.</description>
  </project>
 diff --git a/log/pom.xml b/log/pom.xml
-index 8368f7b3..153780a0 100644
+index 9ee30d66..d2da305a 100644
 --- a/log/pom.xml
 +++ b/log/pom.xml
 @@ -4,18 +4,17 @@
@@ -234,14 +235,14 @@ index 8368f7b3..153780a0 100644
 -        <artifactId>waterfall-parent</artifactId>
 +        <groupId>io.izzel.lightfall</groupId>
 +        <artifactId>lightfall-parent</artifactId>
-         <version>1.20-R0.1-SNAPSHOT</version>
+         <version>1.20-R0.2-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
      </parent>
  
 -    <groupId>io.github.waterfallmc</groupId>
 -    <artifactId>waterfall-log</artifactId>
 +    <artifactId>lightfall-log</artifactId>
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>jar</packaging>
  
 -    <name>Waterfall-Log</name>
@@ -261,7 +262,7 @@ index 8368f7b3..153780a0 100644
              <scope>compile</scope>
          </dependency>
 diff --git a/log4j/pom.xml b/log4j/pom.xml
-index e83b2f21..20a7eccd 100644
+index 6d20191e..f75e7bf9 100644
 --- a/log4j/pom.xml
 +++ b/log4j/pom.xml
 @@ -3,18 +3,17 @@
@@ -272,14 +273,14 @@ index e83b2f21..20a7eccd 100644
 -        <artifactId>waterfall-parent</artifactId>
 +        <groupId>io.izzel.lightfall</groupId>
 +        <artifactId>lightfall-parent</artifactId>
-         <version>1.20-R0.1-SNAPSHOT</version>
+         <version>1.20-R0.2-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
      </parent>
  
 -    <groupId>io.github.waterfallmc</groupId>
 -    <artifactId>waterfall-log4j</artifactId>
 +    <artifactId>lightfall-log4j</artifactId>
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>jar</packaging>
  
 -    <name>Waterfall-Log4J</name>
@@ -288,7 +289,7 @@ index e83b2f21..20a7eccd 100644
  
      <properties>
 diff --git a/module/pom.xml b/module/pom.xml
-index 89c34e80..58b3e668 100644
+index d78c9a25..0917140d 100644
 --- a/module/pom.xml
 +++ b/module/pom.xml
 @@ -4,8 +4,8 @@
@@ -299,11 +300,11 @@ index 89c34e80..58b3e668 100644
 -        <artifactId>waterfall-parent</artifactId>
 +        <groupId>io.izzel.lightfall</groupId>
 +        <artifactId>lightfall-parent</artifactId>
-         <version>1.20-R0.1-SNAPSHOT</version>
+         <version>1.20-R0.2-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
      </parent>
 @@ -15,7 +15,7 @@
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>pom</packaging>
  
 -    <name>Waterfall Modules</name>
@@ -321,7 +322,7 @@ index 89c34e80..58b3e668 100644
              <version>${project.version}</version>
              <scope>compile</scope>
 diff --git a/native/pom.xml b/native/pom.xml
-index 2412768b..db027938 100644
+index 5e9d29d7..d81d9cfa 100644
 --- a/native/pom.xml
 +++ b/native/pom.xml
 @@ -4,18 +4,17 @@
@@ -332,14 +333,14 @@ index 2412768b..db027938 100644
 -        <artifactId>waterfall-parent</artifactId>
 +        <groupId>io.izzel.lightfall</groupId>
 +        <artifactId>lightfall-parent</artifactId>
-         <version>1.20-R0.1-SNAPSHOT</version>
+         <version>1.20-R0.2-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
      </parent>
  
 -    <groupId>io.github.waterfallmc</groupId>
 -    <artifactId>waterfall-native</artifactId>
 +    <artifactId>lightfall-native</artifactId>
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>jar</packaging>
  
 -    <name>Waterfall-Native</name>
@@ -348,7 +349,7 @@ index 2412768b..db027938 100644
  
      <dependencies>
 diff --git a/pom.xml b/pom.xml
-index d333a528..13fc68be 100644
+index 0c04b87a..2117d732 100644
 --- a/pom.xml
 +++ b/pom.xml
 @@ -4,24 +4,23 @@
@@ -366,7 +367,7 @@ index d333a528..13fc68be 100644
 -    <groupId>io.github.waterfallmc</groupId>
 -    <artifactId>waterfall-parent</artifactId>
 +    <artifactId>lightfall-parent</artifactId>
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>pom</packaging>
  
 -    <name>Waterfall-Parent</name>
@@ -414,7 +415,7 @@ index d333a528..13fc68be 100644
  
      <distributionManagement>
 diff --git a/protocol/pom.xml b/protocol/pom.xml
-index c6105b87..bdfc14f5 100644
+index 76a3510d..549cbf87 100644
 --- a/protocol/pom.xml
 +++ b/protocol/pom.xml
 @@ -4,18 +4,17 @@
@@ -425,22 +426,22 @@ index c6105b87..bdfc14f5 100644
 -        <artifactId>waterfall-parent</artifactId>
 +        <groupId>io.izzel.lightfall</groupId>
 +        <artifactId>lightfall-parent</artifactId>
-         <version>1.20-R0.1-SNAPSHOT</version>
+         <version>1.20-R0.2-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
      </parent>
  
 -    <groupId>io.github.waterfallmc</groupId>
 -    <artifactId>waterfall-protocol</artifactId>
 +    <artifactId>lightfall-protocol</artifactId>
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>jar</packaging>
  
 -    <name>Waterfall-Protocol</name>
 +    <name>lightfall-Protocol</name>
      <description>Minimal implementation of the Minecraft protocol for use in Waterfall</description>
  
-     <!-- We really shouldn't depend on external repositories, but at least this is the Central staging one -->
-@@ -41,8 +40,8 @@
+     <!-- We really shouldn't depend on external repositories -->
+@@ -35,8 +34,8 @@
              <scope>compile</scope>
          </dependency>
          <dependency>
@@ -452,7 +453,7 @@ index c6105b87..bdfc14f5 100644
              <scope>compile</scope>
          </dependency>
 diff --git a/proxy/pom.xml b/proxy/pom.xml
-index 83d8719b..e08289d2 100644
+index 9be9aa22..897a8ed9 100644
 --- a/proxy/pom.xml
 +++ b/proxy/pom.xml
 @@ -4,18 +4,17 @@
@@ -463,14 +464,14 @@ index 83d8719b..e08289d2 100644
 -        <artifactId>waterfall-parent</artifactId>
 +        <groupId>io.izzel.lightfall</groupId>
 +        <artifactId>lightfall-parent</artifactId>
-         <version>1.20-R0.1-SNAPSHOT</version>
+         <version>1.20-R0.2-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
      </parent>
  
 -    <groupId>io.github.waterfallmc</groupId>
 -    <artifactId>waterfall-proxy</artifactId>
 +    <artifactId>lightfall-proxy</artifactId>
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>jar</packaging>
  
 -    <name>Waterfall-Proxy</name>
@@ -521,7 +522,7 @@ index 83d8719b..e08289d2 100644
              <scope>compile</scope>
          </dependency>
 diff --git a/proxy/src/main/java/net/md_5/bungee/BungeeCord.java b/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
-index a7091ab6..1fa98f14 100644
+index 01c8a172..f508961e 100644
 --- a/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
 +++ b/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
 @@ -545,7 +545,7 @@ public class BungeeCord extends ProxyServer
@@ -559,7 +560,7 @@ index b26035cf..d7d0ed58 100644
      }
  }
 diff --git a/proxy/src/main/java/net/md_5/bungee/conf/YamlConfig.java b/proxy/src/main/java/net/md_5/bungee/conf/YamlConfig.java
-index 0dd69778..2c3381f7 100644
+index f6b5e8b8..98a175e6 100644
 --- a/proxy/src/main/java/net/md_5/bungee/conf/YamlConfig.java
 +++ b/proxy/src/main/java/net/md_5/bungee/conf/YamlConfig.java
 @@ -227,7 +227,7 @@ public class YamlConfig implements ConfigurationAdapter
@@ -572,7 +573,7 @@ index 0dd69778..2c3381f7 100644
              SocketAddress address = Util.getAddr( addr );
              ServerInfo info = ProxyServer.getInstance().constructServerInfo( name, address, motd, restricted );
 diff --git a/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java b/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java
-index 5bb86152..710d8675 100644
+index 5bb86152..ca9faa28 100644
 --- a/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java
 +++ b/proxy/src/main/java/net/md_5/bungee/module/JenkinsModuleSource.java
 @@ -22,7 +22,7 @@ public class JenkinsModuleSource implements ModuleSource
@@ -580,7 +581,7 @@ index 5bb86152..710d8675 100644
                  "waterfall",
                  net.md_5.bungee.api.ProxyServer.getInstance().getVersion().split(":")[2].split("-")[0],
 -                version.getBuild(),
-+                536,
++                558,
                  module.getName()
              );
              URL website = new URL( url );
@@ -598,7 +599,7 @@ index d3abee44..f7aaf001 100644
                  System.out.println( "Attempting to update plugin from " + moduleVersion + " to " + bungeeVersion );
                  module.getProvider().retrieve( module, bungeeVersion );
 diff --git a/query/pom.xml b/query/pom.xml
-index fc864f83..4d96b6b3 100644
+index 4e9bd6cc..fb9dc20f 100644
 --- a/query/pom.xml
 +++ b/query/pom.xml
 @@ -4,18 +4,17 @@
@@ -609,14 +610,14 @@ index fc864f83..4d96b6b3 100644
 -        <artifactId>waterfall-parent</artifactId>
 +        <groupId>io.izzel.lightfall</groupId>
 +        <artifactId>lightfall-parent</artifactId>
-         <version>1.20-R0.1-SNAPSHOT</version>
+         <version>1.20-R0.2-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
      </parent>
  
 -    <groupId>io.github.waterfallmc</groupId>
 -    <artifactId>waterfall-query</artifactId>
 +    <artifactId>lightfall-query</artifactId>
-     <version>1.20-R0.1-SNAPSHOT</version>
+     <version>1.20-R0.2-SNAPSHOT</version>
      <packaging>jar</packaging>
  
 -    <name>Waterfall-Query</name>
@@ -634,5 +635,5 @@ index fc864f83..4d96b6b3 100644
              <version>${project.version}</version>
              <scope>compile</scope>
 -- 
-2.40.1
+2.36.1.windows.1
 
